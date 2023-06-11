@@ -24,6 +24,7 @@ static void load_grass(elf_reader reader,
     grass_entry = (void*)(GRASS_START + pheader->p_offset);
 }
 
+void (*apps_entry[16])();
 static void load_app(int pid, elf_reader reader,
                      int argc, void** argv,
                      struct elf32_program_header* pheader) {
@@ -32,13 +33,19 @@ static void load_app(int pid, elf_reader reader,
     if (pid < GPID_USER_START) {
         INFO(L"App file size: %d bytes", pheader->p_filesz);
         INFO(L"App memory size: %d bytes", pheader->p_memsz);
+
+        apps_entry[pid] = (void*)(GRASS_START + GRASS_EXEC_NBYTE * pid + pheader->p_offset);
+        INFO(L"App code entry: %d", (int)apps_entry[pid]);
+    } else {
+        FATAL(L"Not implemented");
     }
 
+    /*
     void* base;
     int frame_no, block_offset = pheader->p_offset / BLOCK_SIZE;
     unsigned int code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
 
-    /* Setup the text, rodata, data and bss sections */
+    // Setup the text, rodata, data and bss sections
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
@@ -57,7 +64,7 @@ static void load_app(int pid, elf_reader reader,
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* Setup two pages for argc, argv and stack */
+    // Setup two pages for argc, argv and stack
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, stack_start++, frame_no);
 
@@ -72,6 +79,7 @@ static void load_app(int pid, elf_reader reader,
 
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, stack_start++, frame_no);
+    */
 }
 
 void elf_load(int pid, elf_reader reader, int argc, void** argv) {
@@ -83,7 +91,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
 
     if (pheader->p_vaddr == GRASS_ENTRY)
         load_grass(reader, pheader);
-    else if (pheader->p_vaddr == APPS_ENTRY)
+    else if (pheader->p_vaddr > DISK_START)
         load_app(pid, reader, argc, argv, pheader);
     else
         FATAL(L"elf_load: ELF gives invalid p_vaddr: %d", pheader->p_vaddr);

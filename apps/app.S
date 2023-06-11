@@ -9,7 +9,8 @@
     .section .text
     .global _enter
 _enter:
-    lw a0, 0(a0) /* a0 holds APPS_ARG, the address of integer argc */
-    li sp,0x2FF000
+    lw a0,0(a0) /* a0 holds APPS_ARG, the address of integer argc */
+    /*li sp,0x2FF000*/
+    mv sp,t0
     call main
     call exit

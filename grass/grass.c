@@ -20,6 +20,7 @@ static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
+extern void (*apps_entry[16])();
 int main() {
     CRITICAL(L"Enter the grass layer");
 
@@ -43,7 +44,8 @@ int main() {
     //timer_reset();
     //if (earth->translation == SOFT_TLB) earth->intr_enable();
 
-    void (*sys_proc_entry)() = (void*)APPS_ENTRY;
+    int stack_top = (int)apps_entry[GPID_PROCESS] + PAGE_SIZE * 5;
     asm("mv a0, %0" ::"r"(APPS_ARG));
-    sys_proc_entry();
+    asm("mv t0, %0" ::"r"(stack_top));
+    apps_entry[GPID_PROCESS]();
 }

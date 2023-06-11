@@ -26,6 +26,7 @@ void excp_entry(int id) {
     FATAL(L"excp_entry: kernel got exception %d", id);
 }
 
+static int proc_nprocs;
 void proc_init() {
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);
@@ -43,6 +44,10 @@ void proc_init() {
     /* Student's code ends here. */
 
     /* The first process is currently running */
+    proc_nprocs = 0;
+    proc_curr_idx = 0;
+    for (int i = 0; i < MAX_NPROCESS; i++)
+        proc_set[i].status = PROC_UNUSED;
     proc_set_running(proc_alloc());
 }
 
@@ -52,7 +57,6 @@ static void proc_set_status(int pid, int status) {
 }
 
 int proc_alloc() {
-    static int proc_nprocs = 0;
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
