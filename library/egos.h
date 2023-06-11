@@ -19,13 +19,13 @@ struct earth {
 
     int (*tty_intr)();
     int (*tty_read)(char* buf, int len);
-    int (*tty_write)(char* buf, int len);
+    int (*tty_write)(wchar_t* buf, int len);
 
-    int (*tty_printf)(const char *format, ...);
-    int (*tty_info)(const char *format, ...);
-    int (*tty_fatal)(const char *format, ...);
-    int (*tty_success)(const char *format, ...);
-    int (*tty_critical)(const char *format, ...);
+    int (*tty_printf)(const wchar_t *format, ...);
+    int (*tty_info)(const wchar_t *format, ...);
+    int (*tty_fatal)(const wchar_t *format, ...);
+    int (*tty_success)(const wchar_t *format, ...);
+    int (*tty_critical)(const wchar_t *format, ...);
 
     /* Some information about earth layer configuration */
     enum { QEMU, ARTY, ECE4750 } platform;
@@ -63,11 +63,10 @@ extern struct grass *grass;
 #define APPS_ENTRY         0x00200000  /* 12KB   app code+data         */
 #define GRASS_STACK_TOP    0x001FF000  /* 8KB    earth/grass stack     */
                                        /*        grass interface       */
-#define GRASS_SIZE         0x00002800  /* 10KB */
+#define GRASS_SIZE         0x00003000  /* 12KB */
 #define GRASS_ENTRY        0x00100000  /* 8KB    grass code+data       */
                                        /* 12KB   earth data            */
                                        /* earth code is in QSPI flash  */
-
 
 #ifndef LIBC_STDIO
 /* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */

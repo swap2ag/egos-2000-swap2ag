@@ -16,5 +16,5 @@ _enter:
     addi  gp, gp, %pcrel_lo(_enter)
 
     /* Call main() of earth.c */
-    li sp, 0x1FF000
+    li sp,0x1FF000
     call main

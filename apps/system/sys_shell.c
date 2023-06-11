@@ -27,7 +27,7 @@ int parse_request(char* buf, struct proc_request* req) {
 }
 
 int main() {
-    CRITICAL("Welcome to the egos-2000 shell!");
+    CRITICAL(L"Welcome to the egos-2000 shell!");
     
     char buf[256] = "cd";  /* Enter the home directory first */
     while (1) {
@@ -41,13 +41,13 @@ int main() {
             req.type = PROC_SPAWN;
 
             if (0 != parse_request(buf, &req)) {
-                INFO("sys_shell: too many arguments or argument too long");
+                INFO(L"sys_shell: too many arguments or argument too long");
             } else {
                 grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
                 grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
 
                 if (reply.type != CMD_OK)
-                    INFO("sys_shell: command causes an error");
+                    INFO(L"sys_shell: command causes an error");
                 else if (req.argv[req.argc - 1][0] != '&')
                     /* Wait for foreground command to terminate */
                     grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
@@ -55,7 +55,7 @@ int main() {
         }
 
         do {
-            printf("\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
+            printf(L"\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
         } while (earth->tty_read(buf, 256) == 0);
     }
 }

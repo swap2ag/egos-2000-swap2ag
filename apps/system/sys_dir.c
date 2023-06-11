@@ -26,7 +26,7 @@ int dir_do_lookup(int dir_ino, char* name) {
 }
 
 int main() {
-    SUCCESS("Enter kernel process GPID_DIR");
+    SUCCESS(L"Enter kernel process GPID_DIR");
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
@@ -48,7 +48,7 @@ int main() {
             break;
         case DIR_INSERT: case DIR_REMOVE: default:
             /* This part is left to students as an exercise */
-            FATAL("sys_dir: request%d not implemented", req->type);
+            FATAL(L"sys_dir: request%d not implemented", req->type);
         }
     }
 }

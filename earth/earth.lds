@@ -5,11 +5,13 @@ ENTRY(_enter)
 MEMORY
 {
     ram (arw!xi) : ORIGIN = 0x00000200, LENGTH = 0x100000
+    disk(irx!wa) : ORIGIN = 0x00400000, LENGTH = 0x400000
 }
 
 PHDRS
 {
     ram PT_LOAD;
+    disk PT_LOAD;
 }
 
 SECTIONS
@@ -47,6 +49,11 @@ SECTIONS
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
     } >ram :ram
+
+    .image : {
+        *(.image.placeholder);
+        . += 0x400000;
+    } >disk :disk
 
     PROVIDE( __heap_end = ADDR(.data) + 0x2800 );
 }

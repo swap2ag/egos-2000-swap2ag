@@ -18,5 +18,5 @@ int main() {
      * this memset should trigger an exception, killing this application;
      * Otherwise, the following message will be printed
      */
-    SUCCESS("Crash2 succeeds in corrupting the memory of other processes");
+    SUCCESS(L"Crash2 succeeds in corrupting the memory of other processes");
 }

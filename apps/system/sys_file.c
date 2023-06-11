@@ -13,7 +13,7 @@
 #include <string.h>
 
 int main() {
-    SUCCESS("Enter kernel process GPID_FILE");
+    SUCCESS(L"Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
     inode_intf fs = treedisk_init(fs_disk_init(), 0);
@@ -38,7 +38,7 @@ int main() {
             break;
         case FILE_WRITE: default:
             /* This part is left to students as an exercise */
-            FATAL("sys_file: request%d not implemented", req->type);
+            FATAL(L"sys_file: request%d not implemented", req->type);
         }
     }
 }

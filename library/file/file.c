@@ -25,13 +25,14 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
+//#include <string.h>
 #include "file.h"
 
 #ifdef MKFS
 #include <stdio.h>
 #else
 #include "egos.h"
+void my_memset(void* dst, int val, int len);
 #endif
 
 /* Temporary information about the file system and a particular inode.
@@ -60,7 +61,7 @@ static void panic(const char *s){
     fprintf(stderr, "%s", s);
     exit(1);
 #else 
-    FATAL(s);
+    FATAL(L"file system error");
 #endif
 }
 
@@ -87,7 +88,7 @@ static int treedisk_get_snapshot(struct treedisk_snapshot *snapshot,
     /* Check the inode number.
      */
     if (inode_no >= snapshot->superblock.superblock.n_inodeblocks * INODES_PER_BLOCK) {
-        printf("!!TDERR: inode number too large %u %u\n", inode_no, snapshot->superblock.superblock.n_inodeblocks);
+        FATAL(L"!!TDERR: inode number too large %u %u\n", inode_no, snapshot->superblock.superblock.n_inodeblocks);
         return -1;
     }
 
@@ -398,7 +399,7 @@ int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int n
      */
     unsigned int nblocks = (*below->getsize)(below, below_ino);
     if (nblocks < n_inodeblocks + 2) {
-        printf("treedisk_create: too few blocks\n");
+        FATAL(L"treedisk_create: too few blocks\n");
         return -1;
     }
 

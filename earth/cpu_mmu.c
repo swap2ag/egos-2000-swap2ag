@@ -34,7 +34,7 @@ int mmu_alloc(int* frame_id, void** cached_addr) {
             table[i].use = 1;
             return 0;
         }
-    FATAL("mmu_alloc: no more available frames");
+    FATAL(L"mmu_alloc: no more available frames");
 }
 
 int mmu_free(int pid) {
@@ -119,7 +119,7 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
-    if (pid >= MAX_ROOT_PAGE_TABLES) FATAL("page_table_map: pid too large");
+    if (pid >= MAX_ROOT_PAGE_TABLES) FATAL(L"page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
 

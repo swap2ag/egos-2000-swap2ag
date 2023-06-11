@@ -12,22 +12,22 @@
 
 int main(int argc, char** argv) {
     if (argc == 1) {
-        INFO("usage: cat [FILE]");
+        INFO(L"usage: cat [FILE]");
         return -1;
     }
 
     /* Get the inode number of the file */
     int file_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (file_ino < 0) {
-        INFO("cat: file %s not found", argv[1]);
+        INFO(L"cat: file %s not found", argv[1]);
         return -1;
     }
 
     /* Read and print the first block of the file */
     char buf[BLOCK_SIZE];
     file_read(file_ino, 0, buf);
-    printf("%s", buf);
-    if (buf[strlen(buf) - 1] != '\n') printf("\r\n");
+    printf(L"%s", buf);
+    if (buf[strlen(buf) - 1] != '\n') printf(L"\r\n");
 
     return 0;
 }

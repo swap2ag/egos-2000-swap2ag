@@ -46,7 +46,6 @@ static int grass_read(int block_no, char* dst) {
 int main() {
     /* Initialize the earth layer */
     earth_init();
-    FATAL(L"STOP");
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);

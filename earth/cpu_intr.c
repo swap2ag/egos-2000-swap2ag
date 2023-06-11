@@ -26,9 +26,9 @@ void trap_entry() {
 
     int id = mcause & 0x3FF;
     if (mcause & (1 << 31))
-        (intr_handler)? intr_handler(id) : FATAL("trap_entry: interrupt handler not registered");
+        (intr_handler)? intr_handler(id) : FATAL(L"trap_entry: interrupt handler not registered");
     else
-        (excp_handler)? excp_handler(id) : FATAL("trap_entry: exception handler not registered");
+        (excp_handler)? excp_handler(id) : FATAL(L"trap_entry: exception handler not registered");
 }
 
 int intr_enable() {
@@ -41,7 +41,7 @@ int intr_enable() {
 }
 
 void intr_init() {
-    INFO("Use direct mode and put the address of trap_entry() to mtvec");
+    INFO(L"Use direct mode and put the address of trap_entry() to mtvec");
     asm("csrw mtvec, %0" ::"r"(trap_entry));
 
     earth->intr_enable = intr_enable;

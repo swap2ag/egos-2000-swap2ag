@@ -13,7 +13,7 @@
 
 static int disk_getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
-static int disk_setsize() { FATAL("disk: cannot set the size"); }
+static int disk_setsize() { FATAL(L"disk: cannot set the size"); }
 
 static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
     return earth->disk_read(GRASS_FS_START + offset, 1, block->bytes);

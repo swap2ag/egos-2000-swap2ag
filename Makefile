@@ -1,5 +1,4 @@
-#all: apps
-all:
+all: apps
 	mkdir -p $(DEBUG) $(RELEASE)
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
@@ -30,6 +29,11 @@ install:
 	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
 	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
+
+ece4750:
+	@echo "$(YELLOW)-------- Create ELF for ECE4750 --------$(END)"
+	cp $(RELEASE)/earth.elf $(QEMU)/ece4750.elf
+	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/ece4750.elf
 
 instructions:
 	python3 tools/instructions.py
@@ -63,8 +67,8 @@ TOOLS = tools
 QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
-#OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
-OBJDUMP_FLAGS =  --source --demangle --line-numbers --wide
+OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+#OBJDUMP_FLAGS =  --source --demangle --line-numbers --wide
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

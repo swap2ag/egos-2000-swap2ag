@@ -21,7 +21,7 @@ static int sys_proc_read(int block_no, char* dst) {
 }
 
 int main() {
-    CRITICAL("Enter the grass layer");
+    CRITICAL(L"Enter the grass layer");
 
     /* Initialize the grass interface functions */
     grass->proc_alloc = proc_alloc;
@@ -33,15 +33,15 @@ int main() {
     grass->sys_recv = sys_recv;
     
     /* Load and enter the first kernel process sys_proc */
-    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
+    INFO(L"Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     earth->mmu_switch(GPID_PROCESS);
 
     proc_init();
-    timer_init();
-    timer_reset();
-    /* For page table translation, interrupt was enabled in earth layer */
-    if (earth->translation == SOFT_TLB) earth->intr_enable();
+    /* egos-2000 could enter the shell without timer interrupt */
+    //timer_init();
+    //timer_reset();
+    //if (earth->translation == SOFT_TLB) earth->intr_enable();
 
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     asm("mv a0, %0" ::"r"(APPS_ARG));

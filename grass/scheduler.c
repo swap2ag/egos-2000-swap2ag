@@ -32,7 +32,7 @@ void intr_entry(int id) {
 
     if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
         /* User process killed by ctrl+c interrupt */
-        INFO("process %d killed by interrupt", curr_pid);
+        INFO(L"process %d killed by interrupt", curr_pid);
         asm("csrw mepc, %0" ::"r"(0x800500C));
         return;
     }
@@ -42,7 +42,7 @@ void intr_entry(int id) {
     else if (id == INTR_ID_TIMER)
         kernel_entry = proc_yield;
     else
-        FATAL("intr_entry: got unknown interrupt %d", id);
+        FATAL(L"intr_entry: got unknown interrupt %d", id);
 
     /* Switch to the kernel stack */
     ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
@@ -82,7 +82,7 @@ static void proc_yield() {
         }
     }
 
-    if (next_idx == -1) FATAL("proc_yield: no runnable process");
+    if (next_idx == -1) FATAL(L"proc_yield: no runnable process");
     if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     /* Switch to the next runnable process and reset timer */
@@ -184,6 +184,6 @@ static void proc_syscall() {
         proc_send(sc);
         break;
     default:
-        FATAL("proc_syscall: got unknown syscall type=%d", type);
+        FATAL(L"proc_syscall: got unknown syscall type=%d", type);
     }
 }

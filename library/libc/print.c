@@ -15,7 +15,7 @@
  * and prints the string to the tty device by calling _write().
  */
 
-int _write(int file, char *ptr, int len) {
+int _write(int file, wchar_t *ptr, int len) {
     if (file != STDOUT_FILENO) return -1;
     return earth->tty_write(ptr, len);
 }

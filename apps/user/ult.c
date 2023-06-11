@@ -93,13 +93,13 @@ static void consumer(void *arg){
         sema_dec(&s_full);
         void *x = slots[out++];
         if (out == NSLOTS) out = 0;
-        printf("%s: got '%s'\n", arg, x);
+        printf(L"%s: got '%s'\n", arg, x);
         sema_inc(&s_empty);
     }
 }
 
 int main() {
-    INFO("User-level threading is not implemented.");
+    INFO(L"User-level threading is not implemented.");
 
     /*
     thread_init();

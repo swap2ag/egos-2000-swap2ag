@@ -23,7 +23,7 @@ void excp_entry(int id) {
 
     /* Student's code ends here. */
 
-    FATAL("excp_entry: kernel got exception %d", id);
+    FATAL(L"excp_entry: kernel got exception %d", id);
 }
 
 void proc_init() {
@@ -60,7 +60,7 @@ int proc_alloc() {
             return proc_nprocs;
         }
 
-    FATAL("proc_alloc: reach the limit of %d processes", MAX_NPROCESS);
+    FATAL(L"proc_alloc: reach the limit of %d processes", MAX_NPROCESS);
 }
 
 void proc_free(int pid) {

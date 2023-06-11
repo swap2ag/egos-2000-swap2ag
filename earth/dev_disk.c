@@ -25,7 +25,7 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    FATAL("Attempt to write the on-board ROM");
+    FATAL(L"Attempt to write the on-board ROM");
 }
 
 void disk_init() {

@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     strcat(argv[1], "/");
     int dir_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (dir_ino == -1) {
-        INFO("cd: directory %s not found", argv[1]);
+        INFO(L"cd: directory %s not found", argv[1]);
         return -1;
     }
     grass->workdir_ino = dir_ino;

@@ -17,15 +17,15 @@
 
 static void load_grass(elf_reader reader,
                        struct elf32_program_header* pheader) {
-    INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
-    INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
+    INFO(L"Grass kernel file size: %d bytes", pheader->p_filesz);
+    INFO(L"Grass kernel memory size: %d bytes", pheader->p_memsz);
 
     char* entry = (char*)GRASS_ENTRY;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
         reader(block_offset++, entry + off);
 
-    memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
+    //memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
 }
 
 static void load_app(int pid, elf_reader reader,
@@ -34,8 +34,8 @@ static void load_app(int pid, elf_reader reader,
 
     /* Debug printing during bootup */
     if (pid < GPID_USER_START) {
-        INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
-        INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
+        INFO(L"App file size: %d bytes", pheader->p_filesz);
+        INFO(L"App memory size: %d bytes", pheader->p_memsz);
     }
 
     void* base;
@@ -90,7 +90,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     else if (pheader->p_vaddr == APPS_ENTRY)
         load_app(pid, reader, argc, argv, pheader);
     else
-        FATAL("elf_load: ELF gives invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+        FATAL(L"elf_load: ELF gives invalid p_vaddr: %d", pheader->p_vaddr);
 }
 
 

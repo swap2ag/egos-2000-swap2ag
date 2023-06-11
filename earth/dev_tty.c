@@ -44,7 +44,7 @@ int tty_write(wchar_t* buf, int len) {
         ece4750_wprint_char(buf[i]);
 }
 
-void vprintf( const wchar_t* fmt,  va_list args ) {
+void my_vprintf( const wchar_t* fmt,  va_list args ) {
     int flag = 0;
     while (*fmt != '\0') {
         if (*fmt == '%' ) {
@@ -70,18 +70,18 @@ void vprintf( const wchar_t* fmt,  va_list args ) {
     }
 }
 
-void printf( const wchar_t* fmt, ... )
+void my_printf( const wchar_t* fmt, ... )
 {
   va_list args;
   va_start(args, fmt);
-  vprintf(fmt, args);
+  my_vprintf(fmt, args);
   va_end(args);
 }
 
 #define LOG(x, y)  ece4750_wprint_str(x); \
                    va_list args; \
                    va_start(args, format); \
-                   vprintf(format, args); \
+                   my_vprintf(format, args); \
                    va_end(args); \
                    ece4750_wprint_str(y); \
 

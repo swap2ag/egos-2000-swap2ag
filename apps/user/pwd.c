@@ -10,6 +10,6 @@
 #include "app.h"
 
 int main(int argc, char** argv) {
-    printf("%s\r\n", grass->workdir);
+    printf(L"%s\r\n", grass->workdir);
     return 0;
 }

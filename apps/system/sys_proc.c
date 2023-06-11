@@ -17,18 +17,19 @@ static void sys_spawn(int base);
 static int app_spawn(struct proc_request *req);
 
 int main() {
-    SUCCESS("Enter kernel process GPID_PROCESS");    
+    SUCCESS(L"Enter kernel process GPID_PROCESS");
+    FATAL(L"STOP");
 
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
 
     sys_spawn(SYS_FILE_EXEC_START);
     grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
-    INFO("sys_proc receives: %s", buf);
+    INFO(L"sys_proc receives: %s", buf);
 
     sys_spawn(SYS_DIR_EXEC_START);
     grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
-    INFO("sys_proc receives: %s", buf);
+    INFO(L"sys_proc receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
     
@@ -44,7 +45,7 @@ int main() {
             /* Handling background processes */
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
             if (!shell_waiting && app_pid > 0)
-                INFO("process %d running in the background", app_pid);
+                INFO(L"process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             break;
         case PROC_EXIT:
@@ -53,12 +54,12 @@ int main() {
             if (shell_waiting && app_pid == sender)
                 grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             else
-                INFO("background process %d terminated", sender);
+                INFO(L"background process %d terminated", sender);
             break;
         case PROC_KILLALL:
             grass->proc_free(-1); break;
         default:
-            FATAL("sys_proc: invalid request %d", req->type);
+            FATAL(L"sys_proc: invalid request %d", req->type);
         }
     }
 }
@@ -86,7 +87,7 @@ static int sys_proc_read(int block_no, char* dst) {
 
 static void sys_spawn(int base) {
     int pid = grass->proc_alloc();
-    INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
+    INFO(L"Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
 
     sys_proc_base = base;
     elf_load(pid, sys_proc_read, 0, NULL);
