@@ -43,7 +43,6 @@ int main() {
     //timer_reset();
     //if (earth->translation == SOFT_TLB) earth->intr_enable();
 
-    INFO(L"Start process #%d: sys_proc", GPID_PROCESS);
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     asm("mv a0, %0" ::"r"(APPS_ARG));
     sys_proc_entry();

@@ -57,14 +57,12 @@ int soft_tlb_switch(int pid) {
 
     /* Unmap curr_vm_pid from the user address space */
     for (int i = 0; i < NFRAMES; i++) {
-        INFO(L"Unmap %d/%d", i, NFRAMES);
         if (table[i].use && table[i].pid == curr_vm_pid)
             paging_write(i, table[i].page_no);
     }
 
     /* Map pid to the user address space */
     for (int i = 0; i < NFRAMES; i++){
-        INFO(L"Map %d/%d", i, NFRAMES);
         if (table[i].use && table[i].pid == pid)
             memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
     }

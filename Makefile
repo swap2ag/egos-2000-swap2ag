@@ -53,7 +53,7 @@ APPS_SRCS = apps/app.S library/*/*.c grass/context.S
 GRASS_SRCS = grass/grass.S grass/context.S grass/*.c library/elf/*.c library/libc/memory.c
 EARTH_SRCS = earth/earth.S earth/*.c library/elf/*.c library/libc/*.c
 
-CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
+CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -fPIC
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue
 
