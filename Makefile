@@ -39,7 +39,6 @@ install:
 	@echo "$(YELLOW)-------- Create ELF for ECE4750 --------$(END)"
 	cp $(RELEASE)/earth.elf $(TOOLS)/egos-ece4750
 	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(TOOLS)/egos-ece4750
-	cp tools/egos-ece4750 ../ece4750/app
 
 instructions:
 	python3 tools/instructions.py

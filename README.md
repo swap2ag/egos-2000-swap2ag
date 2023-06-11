@@ -1,4 +1,4 @@
-## Special version for ECE4750
+## Special version for ECE4750 (Work in Progress)
 
 This is a special version of egos-2000 that can run on the teaching processor from [ECE4750 at cornell](https://github.com/cornell-ece4750/). This is a RISC-V processor written in Verilog that runs on the Verilator simulator.
 
