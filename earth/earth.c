@@ -50,20 +50,6 @@ int main() {
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
-    if (earth->translation == SOFT_TLB){
-        /* No need to enter supervisor mode if using softTLB translation */
-        void (*grass_entry)() = (void*)GRASS_ENTRY;
-        grass_entry();
-    } else {
-        /* Enable machine-mode interrupt before entering supervisor mode */
-        earth->intr_enable();
-
-        int mstatus;
-        /* Enter supervisor mode after mret */
-        asm("csrr %0, mstatus" : "=r"(mstatus));
-        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
-        /* Enter the grass layer after mret */
-        asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
-        asm("mret");
-    }
+    void (*grass_entry)() = (void*)GRASS_ENTRY;
+    grass_entry();
 }

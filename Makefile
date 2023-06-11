@@ -1,5 +1,6 @@
 #all: apps
 all:
+	mkdir -p $(DEBUG) $(RELEASE)
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
@@ -30,15 +31,8 @@ install:
 	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 
-program:
-	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
-	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt
-
-qemu:
-	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
-	cp $(RELEASE)/earth.elf $(QEMU)/qemu.elf
-	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/qemu.elf
-	$(RISCV_QEMU) -readconfig $(QEMU)/sifive-e31.cfg -kernel $(QEMU)/qemu.elf -nographic
+instructions:
+	python3 tools/instructions.py
 
 clean:
 	rm -rf build
@@ -69,7 +63,8 @@ TOOLS = tools
 QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
-OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+#OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+OBJDUMP_FLAGS =  --source --demangle --line-numbers --wide
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
