@@ -15,7 +15,6 @@
 
 /* Interface of the paging device, see earth/dev_page.c */
 void  paging_init();
-int   paging_invalidate_cache(int frame_id);
 int   paging_write(int frame_id, int page_no);
 char* paging_read(int frame_id, int alloc_only);
 
@@ -41,7 +40,6 @@ int mmu_alloc(int* frame_id, void** cached_addr) {
 int mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid) {
-            paging_invalidate_cache(i);
             memset(&table[i], 0, sizeof(struct frame_mapping));
         }
 }
@@ -166,28 +164,5 @@ void mmu_init() {
     earth->mmu_map = soft_tlb_map;
     earth->mmu_switch = soft_tlb_switch;
 
-    if (earth->platform == ARTY) {
-        /* Arty board does not support supervisor mode or page tables */
-        earth->translation = SOFT_TLB;
-        return;
-    }
-
-    /* Choose memory translation mechanism in QEMU */
-    CRITICAL("Choose a memory translation mechanism:");
-    printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
-
-    char buf[2];
-    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
-    earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
-    INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
-
-    if (earth->translation == PAGE_TABLE) {
-        /* Setup an identity mapping using page tables */
-        pagetable_identity_mapping(0);
-        asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
-
-        earth->mmu_map = page_table_map;
-        earth->mmu_switch = page_table_switch;
-        earth->mmu_translate = page_table_translate;
-    }
+    earth->translation = SOFT_TLB;
 }

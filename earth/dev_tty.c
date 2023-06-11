@@ -11,85 +11,135 @@
 
 #define LIBC_STDIO
 #include "egos.h"
-#include <stdio.h>
 #include <stdarg.h>
+
+void ece4750_wprint_int( int i )
+{
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030000) );
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(i) );
+}
+
+void ece4750_wprint_char( wchar_t c )
+{
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030001) );
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(c) );
+}
+
+void ece4750_wprint_str( const wchar_t* p )
+{
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030002) );
+  while ( *p != 0 ) {
+    __asm__ ( "csrw 0x7c0, %0" :: "r"(*p) );
+    p++;
+  }
+  __asm__ ( "csrw 0x7c0, %0" :: "r"(*p) );
+}
 
 int uart_getc(int* c);
 void uart_putc(int c);
 void uart_init(long baud_rate);
 
+int tty_write(wchar_t* buf, int len) {
+    for (int i = 0; i < len; i++)
+        ece4750_wprint_char(buf[i]);
+}
+
+void vprintf( const wchar_t* fmt,  va_list args ) {
+    int flag = 0;
+    while (*fmt != '\0') {
+        if (*fmt == '%' ) {
+            flag = 1;
+        }
+        else if ( flag && (*fmt == 'd') ) {
+            ece4750_wprint_int( va_arg(args, int) );
+            flag = 0;
+        }
+        else if ( flag && (*fmt == 'c') ) {
+            // note automatic conversion to integral type
+            ece4750_wprint_char( (wchar_t) (va_arg(args, int)) );
+            flag = 0;
+        }
+        else if ( flag && (*fmt == 's') ) {
+            ece4750_wprint_str( va_arg(args, wchar_t*) );
+            flag = 0;
+        }
+        else {
+            ece4750_wprint_char( *fmt );
+        }
+        ++fmt;
+    }
+}
+
+void printf( const wchar_t* fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt);
+  vprintf(fmt, args);
+  va_end(args);
+}
+
+#define LOG(x, y)  ece4750_wprint_str(x); \
+                   va_list args; \
+                   va_start(args, format); \
+                   vprintf(format, args); \
+                   va_end(args); \
+                   ece4750_wprint_str(y); \
+
+int tty_printf(const wchar_t *format, ...)
+{
+    LOG(L"", L"")
+}
+
+int tty_info(const wchar_t *format, ...) { LOG(L"[INFO] ", L"\r\n") }
+
+int tty_fatal(const wchar_t *format, ...)
+{
+    LOG(L"\x1B[1;31m[FATAL] ", L"\x1B[1;0m\r\n") /* red color */
+    __asm__ ( "csrw 0x7c0, %0" :: "r"(0x10000) );
+}
+
+int tty_success(const wchar_t *format, ...)
+{
+    LOG(L"\x1B[1;32m[SUCCESS] ", L"\x1B[1;0m\r\n") /* green color */
+}
+
+int tty_critical(const wchar_t *format, ...)
+{
+    LOG(L"\x1B[1;33m[CRITICAL] ", L"\x1B[1;0m\r\n") /* yellow color */
+}
+
 static int c, is_reading;
 int tty_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
-int tty_write(char* buf, int len) {
-    for (int i = 0; i < len; i++) uart_putc(buf[i]);
-}
-
 int tty_read(char* buf, int len) {
+  /*
     is_reading = 1;
     for (int i = 0; i < len - 1; i++) {
         for (c = -1; c == -1; uart_getc(&c));
         buf[i] = (char)c;
 
         switch (c) {
-        case 0x03:  /* Ctrl+C    */
+        case 0x03:  // Ctrl+C
             buf[0] = 0;
-        case 0x0d:  /* Enter     */
+        case 0x0d:  // Enter
             buf[i] = is_reading = 0;
-            printf("\r\n");
+            printf(L"\r\n");
             return c == 0x03? 0 : i;
-        case 0x7f:  /* Backspace */
+        case 0x7f:  // Backspace
             c = 0;
-            if (i) printf("\b \b");
+            if (i) printf(L"\b \b");
             i = i ? i - 2 : i - 1;
         }
 
-        if (c) printf("%c", c);
-        fflush(stdout);
+        if (c) printf(L"%c", c);
     }
 
     buf[len - 1] = is_reading = 0;    
     return len - 1;
-}
-
-#define LOG(x, y)  printf(x); \
-                   va_list args; \
-                   va_start(args, format); \
-                   vprintf(format, args); \
-                   va_end(args); \
-                   printf(y); \
-
-int tty_printf(const char *format, ...)
-{
-    LOG("", "")
-    fflush(stdout);
-}
-
-int tty_info(const char *format, ...) { LOG("[INFO] ", "\r\n") }
-
-int tty_fatal(const char *format, ...)
-{
-    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
-    while(1);
-}
-
-int tty_success(const char *format, ...)
-{
-    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* green color */
-}
-
-int tty_critical(const char *format, ...)
-{
-    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* yellow color */
+    */
 }
 
 void tty_init() {
-    uart_init(115200);
-
-    /* Wait for the tty device to be ready */
-    for (int i = 0; i < 2000000; i++);
-    for (int c = 0; c != -1; uart_getc(&c));
-
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;

@@ -1,4 +1,5 @@
-all: apps
+#all: apps
+all:
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
@@ -51,8 +52,8 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 APPS_SRCS = apps/app.S library/*/*.c grass/context.S
-GRASS_SRCS = grass/grass.S grass/context.S grass/*.c library/elf/*.c
-EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
+GRASS_SRCS = grass/grass.S grass/context.S grass/*.c library/elf/*.c library/libc/memory.c
+EARTH_SRCS = earth/earth.S earth/*.c library/elf/*.c library/libc/*.c
 
 CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib

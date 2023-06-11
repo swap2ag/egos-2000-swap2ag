@@ -11,10 +11,10 @@
     .section .text.enter
     .global _enter
 _enter:
-    /* Disable machine interrupt */
-    li t0, 8
-    csrrc t1, mstatus, t0
+    /* Initialize global pointer */
+    auipc gp, %pcrel_hi(_gp)
+    addi  gp, gp, %pcrel_lo(_enter)
 
     /* Call main() of earth.c */
-    li sp, 0x80003f80
+    li sp, 0x1FF000
     call main
