@@ -9,11 +9,13 @@
  */
 
 #include "app.h"
-#include <string.h>
 #include <stdlib.h>
+extern void my_memcpy(void* dst, void* src, int len);
 
 /* To understand directory management, read tools/mkfs.c */
 int dir_do_lookup(int dir_ino, char* name) {
+    FATAL(L"dir_do_lookup: not implemented");
+    /*
     char buf[BLOCK_SIZE];
     file_read(dir_ino, 0, buf);
 
@@ -21,8 +23,8 @@ int dir_do_lookup(int dir_ino, char* name) {
         if (!strncmp(name, buf + i, namelen) &&
             buf[i + namelen] == ' ' && (i == 0 || buf[i - 1] == ' '))
             return atoi(buf + i + namelen);
-
     return -1;
+    */
 }
 
 int main() {
@@ -30,8 +32,8 @@ int main() {
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
-    strcpy(buf, "Finish GPID_DIR initialization");
-    grass->sys_send(GPID_PROCESS, buf, 31);
+    memcpy(buf, L"Finish GPID_DIR initialization", 31 * 4);
+    grass->sys_send(GPID_PROCESS, buf, 31 * 4);
 
     /* Wait for directory requests */
     while (1) {

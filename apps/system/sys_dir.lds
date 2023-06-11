@@ -4,7 +4,7 @@ ENTRY(_enter)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x00561000, LENGTH = 0x8000
+    ram (arw!xi) : ORIGIN = 0x00561000, LENGTH = 0x3000
 }
 
 PHDRS

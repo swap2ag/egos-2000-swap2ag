@@ -28,6 +28,7 @@ int parse_request(char* buf, struct proc_request* req) {
 
 int main() {
     CRITICAL(L"Welcome to the egos-2000 shell!");
+    FATAL(L"STOP");
     
     char buf[256] = "cd";  /* Enter the home directory first */
     while (1) {

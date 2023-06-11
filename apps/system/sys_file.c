@@ -20,8 +20,8 @@ int main() {
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
-    memcpy(buf, L"Finish GPID_FILE initialization", 32*4);
-    grass->sys_send(GPID_PROCESS, buf, 32*4);
+    memcpy(buf, L"Finish GPID_FILE initialization", 32 * 4);
+    grass->sys_send(GPID_PROCESS, buf, 32 * 4);
 
     /* Wait for inode read/write requests */
     while (1) {

@@ -7,7 +7,7 @@ all: apps servers
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/earth.elf > $(DEBUG)/earth.lst
 
 .PHONY: apps
-apps: apps/system/*.c apps/user/*.c
+apps: apps/user/*.c
 	mkdir -p $(DEBUG) $(RELEASE)
 	@echo "$(CYAN)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
