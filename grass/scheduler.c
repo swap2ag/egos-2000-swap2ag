@@ -51,8 +51,9 @@ void intr_entry(int id) {
 void ctx_entry() {
     /* Now on the kernel stack */
     int mepc, tmp;
-    asm("csrr %0, mepc" : "=r"(mepc));
-    proc_set[proc_curr_idx].mepc = (void*) mepc;
+    // TODO: ecall
+    //asm("csrr %0, mepc" : "=r"(mepc));
+    //proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* Student's code goes here (page table translation). */
     /* Save the interrupt stack */
@@ -66,8 +67,9 @@ void ctx_entry() {
     /* Student's code ends here. */
 
     /* Switch back to the user application stack */
-    mepc = (int)proc_set[proc_curr_idx].mepc;
-    asm("csrw mepc, %0" ::"r"(mepc));
+    // TODO: ecall
+    //mepc = (int)proc_set[proc_curr_idx].mepc;
+    //asm("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
@@ -88,7 +90,7 @@ static void proc_yield() {
     /* Switch to the next runnable process and reset timer */
     proc_curr_idx = next_idx;
     earth->mmu_switch(curr_pid);
-    timer_reset();
+    //timer_reset();
 
     /* Student's code goes here (switch privilege level). */
 
@@ -99,14 +101,20 @@ static void proc_yield() {
     /* Student's code ends here. */
 
     /* Call the entry point for newly created process */
+    int apps_entry[] = {0, 0x00521000, 0x00541000, 0x00561000, 0x00581000};
+    int entry = 0x00200000;
+    if (curr_pid < GPID_USER_START) entry = apps_entry[curr_pid];
+
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
         asm("mv a0, %0" ::"r"(APPS_ARG));
         asm("mv a1, %0" ::"r"(APPS_ARG + 4));
         /* Enter application code entry using mret */
-        asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
-        asm("mret");
+        //asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
+        //asm("mret");
+        asm("mv ra, %0" ::"r"(entry));
+        asm("ret");
     }
 
     proc_set_running(curr_pid);
@@ -174,7 +182,7 @@ static void proc_syscall() {
     int type = sc->type;
     sc->retval = 0;
     sc->type = SYS_UNUSED;
-    *((int*)0x2000000) = 0;
+    //*((int*)0x2000000) = 0;
 
     switch (type) {
     case SYS_RECV:

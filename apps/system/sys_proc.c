@@ -86,9 +86,7 @@ static int sys_proc_read(int block_no, char* dst) {
 }
 
 static void sys_spawn(int base) {
-    INFO(L"Allocate process");
     int pid = grass->proc_alloc();
-    INFO(L"Allocated process %d", pid);
     INFO(L"Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
 
     sys_proc_base = base;

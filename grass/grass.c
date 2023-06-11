@@ -32,6 +32,7 @@ int main() {
     grass->sys_exit = sys_exit;
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
+    grass->tmp_ecall = intr_entry;
     
     /* Load and enter the first kernel process sys_proc */
     INFO(L"Load kernel process #%d: sys_proc", GPID_PROCESS);
