@@ -11,7 +11,7 @@
 #include "egos.h"
 #include "disk.h"
 #include "servers.h"
-#include <string.h>
+extern void my_memset(void* dst, int val, int len);
 
 /* Interface of the paging device, see earth/dev_page.c */
 void  paging_init();

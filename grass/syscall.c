@@ -9,7 +9,7 @@
 
 #include "egos.h"
 #include "syscall.h"
-#include <string.h>
+extern void my_memcpy(void* dst, void* src, int len);
 
 static void sys_invoke() {
     /* The standard way of system call is using the `ecall` instruction; 

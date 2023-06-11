@@ -10,19 +10,18 @@
 
 #include "app.h"
 #include "file.h"
-#include <string.h>
+extern void my_memcpy(void* dst, void* src, int len);
 
 int main() {
     SUCCESS(L"Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
     inode_intf fs = treedisk_init(fs_disk_init(), 0);
-    FATAL(L"STOP");
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
-    strcpy(buf, "Finish GPID_FILE initialization");
-    grass->sys_send(GPID_PROCESS, buf, 32);
+    memcpy(buf, L"Finish GPID_FILE initialization", 32*4);
+    grass->sys_send(GPID_PROCESS, buf, 32*4);
 
     /* Wait for inode read/write requests */
     while (1) {

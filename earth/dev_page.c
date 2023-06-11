@@ -13,7 +13,8 @@
 #include "egos.h"
 #include "disk.h"
 #include <stdlib.h>
-#include <string.h>
+extern void my_memset(void* dst, int val, int len);
+extern void my_memcpy(void* dst, void* src, int len);
 #define ARTY_CACHED_NFRAMES 28
 #define NBLOCKS_PER_PAGE PAGE_SIZE / BLOCK_SIZE  /* 4KB / 512B == 8 */
 

@@ -24,6 +24,7 @@ int main() {
     sys_spawn(SYS_FILE_EXEC_START);
     grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
     INFO(L"sys_proc receives: %s", buf);
+    FATAL(L"STOP");
 
     sys_spawn(SYS_DIR_EXEC_START);
     grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);

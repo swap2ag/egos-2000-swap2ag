@@ -12,7 +12,6 @@
 #include "elf.h"
 #include "disk.h"
 #include "egos.h"
-#include <string.h>
 
 void tty_init();
 void disk_init();

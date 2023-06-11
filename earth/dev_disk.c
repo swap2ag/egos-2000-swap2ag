@@ -10,7 +10,7 @@
 #include "egos.h"
 #include "disk.h"
 #include "bus_gpio.c"
-#include <string.h>
+extern void my_memcpy(void* dst, void* src, int len);
 
 enum {
       SD_CARD,

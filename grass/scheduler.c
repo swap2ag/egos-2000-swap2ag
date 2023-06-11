@@ -11,7 +11,7 @@
 #include "egos.h"
 #include "process.h"
 #include "syscall.h"
-#include <string.h>
+extern void my_memcpy(void* dst, void* src, int len);
 
 #define INTR_ID_SOFT       3
 #define INTR_ID_TIMER      7
@@ -45,11 +45,14 @@ void intr_entry(int id) {
         FATAL(L"intr_entry: got unknown interrupt %d", id);
 
     /* Switch to the kernel stack */
+    int sp;
+    asm("mv %0, sp" : "=r"(sp));
     ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
 }
 
 void ctx_entry() {
     /* Now on the kernel stack */
+
     int mepc, tmp;
     // TODO: ecall
     //asm("csrr %0, mepc" : "=r"(mepc));
@@ -106,10 +109,15 @@ static void proc_yield() {
         /* Prepare argc and argv */
         asm("mv a0, %0" ::"r"(APPS_ARG));
         asm("mv a1, %0" ::"r"(APPS_ARG + 4));
+
+        int entry = proc_entry(curr_pid);
+        int stack_top = entry + PAGE_SIZE * 5;
+        asm("mv t0, %0" ::"r"(stack_top));
+
         /* Enter application code entry using mret */
         //asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
         //asm("mret");
-        asm("mv ra, %0" ::"r"(proc_entry(curr_pid)));
+        asm("mv ra, %0" ::"r"(entry));
         asm("ret");
     }
 
@@ -127,14 +135,8 @@ static void proc_send(struct syscall *sc) {
                 curr_status = PROC_WAIT_TO_SEND;
                 proc_set[proc_curr_idx].receiver_pid = receiver;
             } else {
-                /* Copy message from sender to kernel stack */
-                struct sys_msg tmp;
-                earth->mmu_switch(curr_pid);
-                memcpy(&tmp, &sc->msg, sizeof(tmp));
-
-                /* Copy message from kernel stack to receiver */
-                earth->mmu_switch(receiver);
-                memcpy(&sc->msg, &tmp, sizeof(tmp));
+                struct syscall *dst_sc = (struct syscall*)(grass->proc_entry(receiver) + SYSCALL_ARG_OFFSET);
+                memcpy(&dst_sc->msg, &sc->msg, sizeof(struct sys_msg));
 
                 /* Set receiver process as runnable */
                 proc_set_runnable(receiver);
@@ -156,14 +158,7 @@ static void proc_recv(struct syscall *sc) {
     if (sender == -1) {
         curr_status = PROC_WAIT_TO_RECV;
     } else {
-        /* Copy message from sender to kernel stack */
-        struct sys_msg tmp;
-        earth->mmu_switch(sender);
-        memcpy(&tmp, &sc->msg, sizeof(tmp));
-
-        /* Copy message from kernel stack to receiver */
-        earth->mmu_switch(curr_pid);
-        memcpy(&sc->msg, &tmp, sizeof(tmp));
+        FATAL(L"proc_recv: not implemented");
 
         /* Set sender process as runnable */
         proc_set_runnable(sender);

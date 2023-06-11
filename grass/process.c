@@ -10,7 +10,6 @@
 #include "egos.h"
 #include "process.h"
 #include "syscall.h"
-#include <string.h>
 
 void intr_entry(int id);
 
@@ -46,8 +45,10 @@ void proc_init() {
     /* The first process is currently running */
     proc_nprocs = 0;
     proc_curr_idx = 0;
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    for (int i = 0; i < MAX_NPROCESS; i++) {
+        proc_set[i].pid = 0;
         proc_set[i].status = PROC_UNUSED;
+    }
     proc_set_running(proc_alloc());
 }
 
