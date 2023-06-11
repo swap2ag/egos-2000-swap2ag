@@ -19,7 +19,7 @@ enum {
 static int type;
 
 int disk_read(int block_no, int nblocks, char* dst) {
-    char* src = (char*)0x00400000 + block_no * BLOCK_SIZE;
+    char* src = (char*)DISK_START + block_no * BLOCK_SIZE;
     memcpy(dst, src, nblocks * BLOCK_SIZE);
     return 0;
 }

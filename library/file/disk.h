@@ -1,7 +1,9 @@
 #pragma once
 
+#define DISK_START            0x00400000
 #define BLOCK_SIZE            512
 #define PAGING_DEV_SIZE       1024 * 1024
+#define GRASS_START           DISK_START + PAGING_DEV_SIZE
 #define GRASS_NEXEC           8
 #define GRASS_EXEC_SIZE       1024 * 1024
 #define FS_DISK_SIZE          1024 * 1024 * 2

@@ -34,7 +34,7 @@ static void earth_init() {
     SUCCESS(L"Finished initializing the disk device");
 
     mmu_init();
-    SUCCESS(L"Finished initializing the CPU memory management unit");
+    SUCCESS(L"Finished initializing the memory management unit");
     earth->platform = ECE4750;
 }
 
@@ -42,12 +42,13 @@ static int grass_read(int block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
+extern void (*grass_entry)();
 int main() {
     /* Initialize the earth layer */
     earth_init();
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
-    void (*grass_entry)() = (void*)GRASS_ENTRY;
+    //void (*grass_entry)() = (void*)GRASS_ENTRY;
     grass_entry();
 }

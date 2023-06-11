@@ -64,7 +64,7 @@ extern struct grass *grass;
 #define GRASS_STACK_TOP    0x001FF000  /* 8KB    earth/grass stack     */
                                        /*        grass interface       */
 #define GRASS_SIZE         0x00003000  /* 12KB */
-#define GRASS_ENTRY        0x00100000  /* 8KB    grass code+data       */
+#define GRASS_ENTRY        0x00501000  /* 8KB    grass code+data       */
                                        /* 12KB   earth data            */
                                        /* earth code is in QSPI flash  */
 

@@ -15,17 +15,13 @@
 
 #include <string.h>
 
+void (*grass_entry)();
 static void load_grass(elf_reader reader,
                        struct elf32_program_header* pheader) {
     INFO(L"Grass kernel file size: %d bytes", pheader->p_filesz);
     INFO(L"Grass kernel memory size: %d bytes", pheader->p_memsz);
 
-    char* entry = (char*)GRASS_ENTRY;
-    int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
-        reader(block_offset++, entry + off);
-
-    //memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
+    grass_entry = (void*)(GRASS_START + pheader->p_offset);
 }
 
 static void load_app(int pid, elf_reader reader,
