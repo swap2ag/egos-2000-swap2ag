@@ -49,6 +49,5 @@ int main() {
     int stack_top = (int)apps_entry[GPID_PROCESS] + PAGE_SIZE * 5;
     asm("mv a0, %0" ::"r"(APPS_ARG));
     asm("mv t0, %0" ::"r"(stack_top));
-    INFO(L"grass: stack_top of sys_proc is %d", stack_top);
     apps_entry[GPID_PROCESS]();
 }
