@@ -90,7 +90,6 @@ static void sys_spawn(int base) {
     int pid = grass->proc_alloc();
     INFO(L"Allocated process %d", pid);
     INFO(L"Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
-    FATAL(L"STOP");
 
     sys_proc_base = base;
     elf_load(pid, sys_proc_read, 0, NULL);

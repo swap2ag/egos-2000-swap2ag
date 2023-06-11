@@ -1,5 +1,4 @@
-all: apps
-	mkdir -p $(DEBUG) $(RELEASE)
+all: apps servers
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
@@ -19,18 +18,24 @@ apps: apps/system/*.c apps/user/*.c
 	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
 
+servers:
+	# sys_proc
+	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_proc.c -Tapps/system/sys_proc.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_proc.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_proc.elf > $(DEBUG)/sys_proc.lst
+	# sys_file
+	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_file.c -Tapps/system/sys_file.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_file.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_file.elf > $(DEBUG)/sys_file.lst
+	# sys_dir
+	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_dir.c -Tapps/system/sys_dir.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_dir.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_dir.elf > $(DEBUG)/sys_dir.lst
+	# sys_shell
+	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_shell.c -Tapps/system/sys_shell.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_shell.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_shell.elf > $(DEBUG)/sys_shell.lst
+
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
 	cd $(TOOLS); ./mkfs
-	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
-	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
-	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
-	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
-	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
-
-ece4750:
 	@echo "$(YELLOW)-------- Create ELF for ECE4750 --------$(END)"
 	cp $(RELEASE)/earth.elf $(TOOLS)/egos-ece4750
 	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(TOOLS)/egos-ece4750
