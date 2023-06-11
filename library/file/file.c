@@ -25,11 +25,11 @@
  */
 
 #include <stdlib.h>
-//#include <string.h>
 #include "file.h"
 
 #ifdef MKFS
 #include <stdio.h>
+#include <string.h>
 #else
 #include "egos.h"
 void my_memset(void* dst, int val, int len);
@@ -88,7 +88,7 @@ static int treedisk_get_snapshot(struct treedisk_snapshot *snapshot,
     /* Check the inode number.
      */
     if (inode_no >= snapshot->superblock.superblock.n_inodeblocks * INODES_PER_BLOCK) {
-        FATAL(L"!!TDERR: inode number too large %u %u\n", inode_no, snapshot->superblock.superblock.n_inodeblocks);
+        /*printf("!!TDERR: inode number too large %u %u\n", inode_no, snapshot->superblock.superblock.n_inodeblocks);*/
         return -1;
     }
 
@@ -399,7 +399,7 @@ int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int n
      */
     unsigned int nblocks = (*below->getsize)(below, below_ino);
     if (nblocks < n_inodeblocks + 2) {
-        FATAL(L"treedisk_create: too few blocks\n");
+        /*printf("treedisk_create: too few blocks\n");*/
         return -1;
     }
 

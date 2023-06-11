@@ -35,6 +35,7 @@ int main() {
     /* Load and enter the first kernel process sys_proc */
     INFO(L"Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
+    INFO(L"Prepare memory for process #%d: sys_proc", GPID_PROCESS);
     earth->mmu_switch(GPID_PROCESS);
 
     proc_init();
@@ -43,6 +44,7 @@ int main() {
     //timer_reset();
     //if (earth->translation == SOFT_TLB) earth->intr_enable();
 
+    INFO(L"Start process #%d: sys_proc", GPID_PROCESS);
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     asm("mv a0, %0" ::"r"(APPS_ARG));
     sys_proc_entry();
