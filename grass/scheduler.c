@@ -101,10 +101,6 @@ static void proc_yield() {
     /* Student's code ends here. */
 
     /* Call the entry point for newly created process */
-    int apps_entry[] = {0, 0x00521000, 0x00541000, 0x00561000, 0x00581000};
-    int entry = 0x00200000;
-    if (curr_pid < GPID_USER_START) entry = apps_entry[curr_pid];
-
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
@@ -113,7 +109,7 @@ static void proc_yield() {
         /* Enter application code entry using mret */
         //asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
         //asm("mret");
-        asm("mv ra, %0" ::"r"(entry));
+        asm("mv ra, %0" ::"r"(proc_entry(curr_pid)));
         asm("ret");
     }
 
@@ -177,7 +173,7 @@ static void proc_recv(struct syscall *sc) {
 }
 
 static void proc_syscall() {
-    struct syscall *sc = (struct syscall*)SYSCALL_ARG;
+    struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
 
     int type = sc->type;
     sc->retval = 0;

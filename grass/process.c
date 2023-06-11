@@ -83,6 +83,12 @@ void proc_free(int pid) {
         }
 }
 
+int proc_entry(int pid) {
+    if (pid == -1) pid = curr_pid;
+    int apps_entry[] = {0, 0x00521000, 0x00541000, 0x00561000, 0x00581000};
+    return (pid < GPID_USER_START)? apps_entry[pid] : 0x00200000;
+}
+
 void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
 void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
 void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }

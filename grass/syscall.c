@@ -11,20 +11,20 @@
 #include "syscall.h"
 #include <string.h>
 
-static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
-
 static void sys_invoke() {
     /* The standard way of system call is using the `ecall` instruction; 
      * Switching to ecall is given to students as an exercise */
     //*((int*)0x2000000) = 1;
+    //while (sc->type != SYS_UNUSED);
+
     // TODO: ecall
     grass->tmp_ecall(3);
-    while (sc->type != SYS_UNUSED);
 }
 
 int sys_send(int receiver, char* msg, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
+    struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
     sc->type = SYS_SEND;
     sc->msg.receiver = receiver;
     memcpy(sc->msg.content, msg, size);
@@ -35,6 +35,7 @@ int sys_send(int receiver, char* msg, int size) {
 int sys_recv(int* sender, char* buf, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
+    struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
     sc->type = SYS_RECV;
     sys_invoke();
     memcpy(buf, sc->msg.content, size);

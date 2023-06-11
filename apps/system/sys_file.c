@@ -14,10 +14,10 @@
 
 int main() {
     SUCCESS(L"Enter kernel process GPID_FILE");
-    FATAL(L"STOP");
 
     /* Initialize the file system interface */
     inode_intf fs = treedisk_init(fs_disk_init(), 0);
+    FATAL(L"STOP");
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];

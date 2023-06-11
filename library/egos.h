@@ -40,6 +40,7 @@ struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
+    int  (*proc_entry)(int pid);
     void (*proc_set_ready)(int pid);
 
     /* System call interface */
@@ -58,7 +59,7 @@ extern struct grass *grass;
 #define FRAME_CACHE_START  0x00300000  /* 1MB    frame cache           */
                                        /*        earth interface       */
 #define APPS_STACK_TOP     0x002FF000  /* 6KB    app stack             */
-#define SYSCALL_ARG        0x002FD400  /* 1KB    system call args      */
+#define SYSCALL_ARG_OFFSET 0x00000400  /* 1KB    system call args      */
 #define APPS_ARG           0x002FD000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE          0x00003000  
 #define APPS_ENTRY         0x00200000  /* 12KB   app code+data         */
