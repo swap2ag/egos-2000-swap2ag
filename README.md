@@ -1,53 +1,53 @@
-## Vision
+## Special version for ECE4750
 
-This project's vision is to help **every** college student read **all** the code of an operating system.
+This is a special version of egos-2000 that can run on the teaching processor from [ECE4750 at cornell](https://github.com/cornell-ece4750/). This is a RISC-V processor written in Verilog that runs on the Verilator simulator.
 
-With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
-It can run on a RISC-V board and also the QEMU software emulator.
+## Step1: Setup the compiler and compile egos-2000
 
-![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
+Setup your working directory and name it as `$EGOS`.
 
 ```shell
-# The cloc utility is used to count the lines of code (LOC).
-# The command below counts the LOC of everything excluding text documents.
-> cloc egos-2000 --exclude-ext=md,txt
-...
-github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-C                               37            510            665           1579
-C/C++ Header                    10             68            105            285
-Assembly                         4              6             31             72
-make                             1             12              0             64
--------------------------------------------------------------------------------
-SUM:                            52            596            801           2000 (exactly 2000!)
--------------------------------------------------------------------------------
+> export EGOS=/home/yunhao/egos
+> cd $EGOS
+> git clone https://github.com/yhzhang0128/egos-2000.git
+# now the code repository is at $EGOS/egos-2000
 ```
 
-## Earth and Grass Operating System
+Download the [SiFive riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory `$EGOS`.
 
-We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/). It adopts a 3-layer architecture.
+```shell
+> cd $EGOS
+> tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
+> export PATH=$PATH:$EGOS/riscv64-unknown...../bin
+> cd $EGOS/egos-2000
+> make
+mkdir -p build/debug build/release
+-------- Compile the Apps Layer --------
+......
+```
 
-* The **earth layer** implements hardware-specific abstractions.
-    * tty and disk device interfaces
-    * interrupt and memory management interfaces
-* The **grass layer** implements hardware-independent abstractions.
-    * processes, system calls and inter-process communications
-* The **application layer** implements file system, shell and user commands.
+## Step2: Create the ELF binary for ECE4750
 
-The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
+Make sure you have a C compiler (i.e., the `cc` command) in your shell environment.
 
-### Usages and Documentation
+```shell
+> cd $EGOS/egos-2000
+> make install
+-------- Create the Disk Image --------
+......
+[INFO] Finish making the disk image (tools/disk.img)
+-------- Create ELF for ECE4750 --------
+cp build/release/earth.elf tools/egos-ece4750
+riscv64-unknown-elf-objcopy --update-section .image=tools/disk.img tools/egos-ece4750
+```
 
-For compiling and running egos-2000, please read [this document](references/USAGES.md).
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) and [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduce the privileged ISA and processor memory map.
-[This document](references/README.md) further introduces the teaching plans, architecture and development history.
+After this step, `tools/egos-ece4750` is the ELF binary for ECE4750.
 
-For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
+## Step3: Run egos-2000 on ECE4750
 
-## Acknowledgements
-
-Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/) and [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) for supporting this project.
-Many thanks to Meta for a [Meta fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
-Many thanks to all CS5411/4411 students at Cornell over the years for helping improve this course.
+```shell
+> cd ece4750
+> sim/lab4_sys/sys-sim $EGOS/tools/egos-ece4750
+[CRITICAL] ------------- Booting -------------
+......
+```
