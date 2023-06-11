@@ -32,8 +32,8 @@ install:
 
 ece4750:
 	@echo "$(YELLOW)-------- Create ELF for ECE4750 --------$(END)"
-	cp $(RELEASE)/earth.elf $(QEMU)/ece4750.elf
-	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/ece4750.elf
+	cp $(RELEASE)/earth.elf $(TOOLS)/egos-ece4750
+	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(TOOLS)/egos-ece4750
 
 instructions:
 	python3 tools/instructions.py

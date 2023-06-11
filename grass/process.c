@@ -27,7 +27,6 @@ void excp_entry(int id) {
 }
 
 void proc_init() {
-    INFO(L"Enter proc_init()");
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);
 
@@ -44,7 +43,6 @@ void proc_init() {
     /* Student's code ends here. */
 
     /* The first process is currently running */
-    INFO(L"Allocate process in proc_init()");
     proc_set_running(proc_alloc());
 }
 
