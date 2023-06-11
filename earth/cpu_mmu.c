@@ -19,7 +19,8 @@ int   paging_write(int frame_id, int page_no);
 char* paging_read(int frame_id, int alloc_only);
 
 /* Allocation and free of physical frames */
-#define NFRAMES 256
+#define NFRAMES 30
+//#define NFRAMES 256
 struct frame_mapping {
     int use;     /* Is the frame allocated? */
     int pid;     /* Which process owns the frame? */
@@ -55,14 +56,18 @@ int soft_tlb_switch(int pid) {
     if (pid == curr_vm_pid) return 0;
 
     /* Unmap curr_vm_pid from the user address space */
-    for (int i = 0; i < NFRAMES; i++)
+    for (int i = 0; i < NFRAMES; i++) {
+        INFO(L"Unmap %d/%d", i, NFRAMES);
         if (table[i].use && table[i].pid == curr_vm_pid)
             paging_write(i, table[i].page_no);
+    }
 
     /* Map pid to the user address space */
-    for (int i = 0; i < NFRAMES; i++)
+    for (int i = 0; i < NFRAMES; i++){
+        INFO(L"Map %d/%d", i, NFRAMES);
         if (table[i].use && table[i].pid == pid)
             memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
+    }
 
     curr_vm_pid = pid;
 }

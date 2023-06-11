@@ -41,8 +41,9 @@ int intr_enable() {
 }
 
 void intr_init() {
-    INFO(L"Use direct mode and put the address of trap_entry() to mtvec");
-    asm("csrw mtvec, %0" ::"r"(trap_entry));
+    /* TODO: support exception handling in processor */
+    //INFO(L"Use direct mode and put the address of trap_entry() to mtvec");
+    //asm("csrw mtvec, %0" ::"r"(trap_entry));
 
     earth->intr_enable = intr_enable;
     earth->intr_register = intr_register;

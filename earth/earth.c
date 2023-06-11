@@ -27,9 +27,8 @@ static void earth_init() {
     CRITICAL(L"------------- Booting -------------");
     SUCCESS(L"Finished initializing the tty device");
 
-    /* egos-2000 could enter the shell without timer interrupt */
-    //intr_init();
-    //SUCCESS("Finished initializing the CPU interrupts");
+    intr_init();
+    SUCCESS(L"Finished initializing the CPU interrupts");
 
     disk_init();
     SUCCESS(L"Finished initializing the disk device");
