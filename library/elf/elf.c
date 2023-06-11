@@ -35,9 +35,8 @@ static void load_app(int pid, elf_reader reader,
         INFO(L"App memory size: %d bytes", pheader->p_memsz);
 
         apps_entry[pid] = (void*)(GRASS_START + GRASS_EXEC_NBYTE * pid + pheader->p_offset);
-        INFO(L"App code entry: %d", (int)apps_entry[pid]);
     } else {
-        FATAL(L"Not implemented");
+        FATAL(L"load_app: not implemented");
     }
 
     /*

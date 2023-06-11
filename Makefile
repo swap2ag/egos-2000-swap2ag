@@ -19,16 +19,16 @@ apps: apps/user/*.c
 	done
 
 servers:
-	# sys_proc
+	echo "Compile apps/system/sys_proc.c"
 	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_proc.c -Tapps/system/sys_proc.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_proc.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_proc.elf > $(DEBUG)/sys_proc.lst
-	# sys_file
+	echo "Compile apps/system/sys_file.c"
 	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_file.c -Tapps/system/sys_file.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_file.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_file.elf > $(DEBUG)/sys_file.lst
-	# sys_dir
+	echo "Compile apps/system/sys_dir.c"
 	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_dir.c -Tapps/system/sys_dir.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_dir.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_dir.elf > $(DEBUG)/sys_dir.lst
-	# sys_shell
+	echo "Compile apps/system/sys_shell.c"
 	$(RISCV_CC) $(COMMON) $(APPS_SRCS) apps/system/sys_shell.c -Tapps/system/sys_shell.lds -lc -lgcc -Iapps -o $(RELEASE)/sys_shell.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/sys_shell.elf > $(DEBUG)/sys_shell.lst
 
