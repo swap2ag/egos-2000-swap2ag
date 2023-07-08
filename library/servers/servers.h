@@ -1,7 +1,7 @@
 #pragma once
 
 #include "inode.h"
-#define SYSCALL_MSG_LEN    1024
+#define SYSCALL_MSG_LEN    540
 
 void exit(int status);
 int dir_lookup(int dir_ino, int* name);

@@ -27,6 +27,7 @@ int sys_send(int receiver, int* msg, int size) {
     struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
     sc->type = SYS_SEND;
     sc->msg.receiver = receiver;
+    sc->msg_size = size + 8;  /* struct sys_msg has 2 more integers */
     memcpy(sc->msg.content, msg, size);
     sys_invoke();
     return sc->retval;    

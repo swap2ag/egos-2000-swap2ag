@@ -18,6 +18,7 @@ struct sys_msg {
 struct syscall {
     enum syscall_type type;  /* Type of the system call */
     struct sys_msg msg;      /* Data of the system call */
+    int msg_size;            /* Size of the data */
     int retval;              /* Return value of the system call */
 };
 

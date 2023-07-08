@@ -136,7 +136,7 @@ static void proc_send(struct syscall *sc) {
                 proc_set[proc_curr_idx].receiver_pid = receiver;
             } else {
                 struct syscall *dst_sc = (struct syscall*)(grass->proc_entry(receiver) + SYSCALL_ARG_OFFSET);
-                memcpy(&dst_sc->msg, &sc->msg, sizeof(struct sys_msg));
+                memcpy(&dst_sc->msg, &sc->msg, sc->msg_size);
 
                 /* Set receiver process as runnable */
                 proc_set_runnable(receiver);
@@ -159,7 +159,7 @@ static void proc_recv(struct syscall *sc) {
         curr_status = PROC_WAIT_TO_RECV;
     } else {
         struct syscall *src_sc = (struct syscall*)(grass->proc_entry(sender) + SYSCALL_ARG_OFFSET);
-        memcpy(&sc->msg, &src_sc->msg, sizeof(struct sys_msg));
+        memcpy(&sc->msg, &src_sc->msg, src_sc->msg_size);
 
         /* Set sender process as runnable */
         proc_set_runnable(sender);

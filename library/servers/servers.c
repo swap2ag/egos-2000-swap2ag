@@ -28,7 +28,7 @@ int dir_lookup(int dir_ino, int* name) {
     strcpy(req.name, name);
     grass->sys_send(GPID_DIR, (void*)&req, sizeof(req));
 
-    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(&sender, buf, sizeof(struct dir_reply));
     if (sender != GPID_DIR) FATAL(L"dir_lookup: an error occurred");
     struct dir_reply *reply = (void*)buf;
 
@@ -42,7 +42,7 @@ int file_read(int file_ino, int offset, int* block) {
     req.offset = offset;
     grass->sys_send(GPID_FILE, (void*)&req, sizeof(req));
 
-    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(&sender, buf, sizeof(struct file_reply));
     if (sender != GPID_FILE) FATAL(L"file_read: an error occurred");
     struct file_reply *reply = (void*)buf;
     memcpy(block, reply->block.bytes, BLOCK_SIZE);
