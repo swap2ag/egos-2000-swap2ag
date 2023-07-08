@@ -42,12 +42,10 @@ int main() {
      * It is just too slow in the simulation.
      */
 
-    //int home_ino = dir_lookup(0, L"home/");
     int home_ino = 1;
-    INFO(L"sys_shell: /home is inode #%d", home_ino);
-    //grass->workdir_ino = dir_lookup(home_ino, L"yunhao/");
+    //int home_ino = dir_lookup(0, L"home/");
     grass->workdir_ino = 2;
-    INFO(L"sys_shell: /home/yunhao is inode #%d", grass->workdir_ino);
+    //grass->workdir_ino = dir_lookup(home_ino, L"yunhao/");
     strcpy(grass->workdir, L"/home/yunhao");
 
     int buf[64];
