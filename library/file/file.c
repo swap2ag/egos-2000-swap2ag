@@ -148,13 +148,10 @@ static block_no treedisk_alloc_block(struct treedisk_state *ts, struct treedisk_
 /* Retrieve the number of blocks in the file referenced by 'this_bs'.  This
  * information is maintained in the inode itself.
  */
-static int treedisk_getsize(inode_store_t *this_bs, unsigned int ino){
-    struct treedisk_state *ts = this_bs->state;
-    struct treedisk_snapshot snapshot;
-    if (treedisk_get_snapshot(&snapshot, ts, ino) < 0)
-        return -1;
 
-    return snapshot.inode->nblocks; 
+#define MAX_INODE_SIZE 30
+static int treedisk_getsize(inode_store_t *this_bs, unsigned int ino){
+    return MAX_INODE_SIZE;
 }
 
 /* Set the size of the file 'this_bs' to 'nblocks'.
@@ -168,54 +165,8 @@ static int treedisk_setsize(inode_store_t *this_bs, unsigned int ino, block_no n
 static int treedisk_read(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
     struct treedisk_state *ts = this_bs->state;
 
-    /* Get info from underlying file system.
-     */
-    struct treedisk_snapshot snapshot;
-    if (treedisk_get_snapshot(&snapshot, ts, ino) < 0)
-        return -1;
-
-    /* See if the offset is too big.
-     */
-    if (offset >= snapshot.inode->nblocks) {
-        /* printf("!!TDERR: offset too large %u %u\n", offset, snapshot.inode->nblocks); */
-        return -1;
-    }
-
-    /* Figure out how many levels there are in the tree.
-     */
-    unsigned int nlevels = 0;
-    if (snapshot.inode->nblocks > 0)
-        while (log_shift_r(snapshot.inode->nblocks - 1, nlevels * log_rpb) != 0) {
-            nlevels++;
-        }
-
-    /* Walk down from the root block.
-     */
-    block_no b = snapshot.inode->root;
-    for (;;) {
-        /* If there's a hole, return the null block.
-         */
-        if (b == 0) {
-            memset(block, 0, BLOCK_SIZE);
-            return 0;
-        }
-
-        /* Return the next level.  If the last level, we're done.
-         */
-        int result = (*ts->below->read)(ts->below, ts->below_ino, b, block);
-        if (result < 0)
-            return result;
-        if (nlevels == 0)
-            return 0;
-
-        /* The block is an indirect block.  Figure out the index into this
-         * block and get the block number.
-         */
-        nlevels--;
-        struct treedisk_indirblock *tib = (struct treedisk_indirblock *) block;
-        unsigned int index = log_shift_r(offset, nlevels * log_rpb) % REFS_PER_BLOCK;
-        b = tib->refs[index];
-    }
+    int dummy_offset = ino * MAX_INODE_SIZE + offset;
+    (*ts->below->read)(ts->below, ts->below_ino, dummy_offset, block);
     return 0;
 }
 
@@ -223,106 +174,9 @@ static int treedisk_read(inode_store_t *this_bs, unsigned int ino, block_no offs
  */
 static int treedisk_write(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
     struct treedisk_state *ts = this_bs->state;
-    int dirty_inode = 0;
 
-    /* Get info from underlying file system.
-     */
-    struct treedisk_snapshot snapshot_buffer;
-    struct treedisk_snapshot *snapshot = &snapshot_buffer;
-    if (treedisk_get_snapshot(snapshot, ts, ino) < 0)
-        return -1;
-
-    /* Figure out how many levels there are in the tree now.
-     */
-    unsigned int nlevels = 0;
-    if (snapshot->inode->nblocks > 0)
-        while (log_shift_r(snapshot->inode->nblocks - 1, nlevels * log_rpb) != 0) {
-            nlevels++;
-        }
-
-    /* Figure out how many levels we need after writing.  Files cannot shrink
-     * by writing.
-     */
-    unsigned int nlevels_after;
-    if (offset >= snapshot->inode->nblocks) {
-        snapshot->inode->nblocks = offset + 1;
-        dirty_inode = 1;
-        nlevels_after = 0;
-        while (log_shift_r(offset, nlevels_after * log_rpb) != 0) {
-            nlevels_after++;
-        }
-    }
-    else {
-        nlevels_after = nlevels;
-    }
-
-    /* Grow the number of levels as needed by inserting indirect blocks.
-     */
-    if (snapshot->inode->nblocks == 0) {
-        nlevels = nlevels_after;
-    } else if (nlevels_after > nlevels) {
-        while (nlevels_after > nlevels) {
-            block_no indir = treedisk_alloc_block(ts, snapshot);
-
-            /* Insert the new indirect block into the inode.
-             */
-            struct treedisk_indirblock tib;
-            memset(&tib, 0, BLOCK_SIZE);
-            tib.refs[0] = snapshot->inode->root;
-            snapshot->inode->root = indir;
-            dirty_inode = 1;
-            if ((*ts->below->write)(ts->below, ts->below_ino, indir, (block_t *) &tib) < 0) {
-                panic("treedisk_write: indirect block");
-            }
-
-            nlevels++;
-        }
-    }
-
-    /* If the inode block was updated, write it back now.
-     */
-    if (dirty_inode)
-        if ((*ts->below->write)(ts->below, ts->below_ino, snapshot->inode_blockno, (block_t *) &snapshot->inodeblock) < 0) {
-            panic("treedisk_write: inode block");
-        }
-
-    /* Find the block by walking the tree, allocating new blocks
-     * (and indirect blocks) if necessary.
-     */
-    block_no b;
-    block_no *parent_no = &snapshot->inode->root;
-    block_no parent_off = snapshot->inode_blockno;
-    block_t *parent_block = (block_t *) &snapshot->inodeblock;
-    for (;;) {
-        /* Get or allocate the next block.
-         */
-        struct treedisk_indirblock tib;
-        if ((b = *parent_no) == 0) {
-            b = *parent_no = treedisk_alloc_block(ts, snapshot);
-            if ((*ts->below->write)(ts->below, ts->below_ino, parent_off, parent_block) < 0)
-                panic("treedisk_write: parent");
-            if (nlevels == 0)
-                break;
-            memset(&tib, 0, BLOCK_SIZE);
-        }
-        else {
-            if (nlevels == 0)
-                break;
-            if ((*ts->below->read)(ts->below, ts->below_ino, b, (block_t *) &tib) < 0)
-                panic("treedisk_write");
-        }
-
-        /* Figure out the index into this block and get the block number.
-         */
-        nlevels--;
-        unsigned int index = log_shift_r(offset, nlevels * log_rpb) % REFS_PER_BLOCK;
-        parent_no = &tib.refs[index];
-        parent_block = (block_t *) &tib;
-        parent_off = b;
-    }
-
-    if ((*ts->below->write)(ts->below, ts->below_ino, b, block) < 0)
-        panic("treedisk_write: data block");
+    int dummy_offset = ino * MAX_INODE_SIZE + offset;
+    (*ts->below->write)(ts->below, ts->below_ino, dummy_offset, block);
     return 0;
 }
 
