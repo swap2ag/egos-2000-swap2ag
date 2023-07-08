@@ -15,24 +15,24 @@
 
 void ece4750_wprint_int( int i )
 {
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030000) );
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(i) );
+    asm( "csrw 0x7c0, %0" :: "r"(0x00030000) );
+    asm( "csrw 0x7c0, %0" :: "r"(i) );
 }
 
 void ece4750_wprint_char( wchar_t c )
 {
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030001) );
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(c) );
+    asm( "csrw 0x7c0, %0" :: "r"(0x00030001) );
+    asm( "csrw 0x7c0, %0" :: "r"(c) );
 }
 
 void ece4750_wprint_str( const wchar_t* p )
 {
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(0x00030002) );
-  while ( *p != 0 ) {
-    __asm__ ( "csrw 0x7c0, %0" :: "r"(*p) );
-    p++;
-  }
-  __asm__ ( "csrw 0x7c0, %0" :: "r"(*p) );
+    asm( "csrw 0x7c0, %0" :: "r"(0x00030002) );
+    while ( *p != 0 ) {
+        asm( "csrw 0x7c0, %0" :: "r"(*p) );
+        p++;
+    }
+    asm( "csrw 0x7c0, %0" :: "r"(*p) );
 }
 
 int uart_getc(int* c);
@@ -68,6 +68,7 @@ void my_vprintf( const wchar_t* fmt,  va_list args ) {
         }
         ++fmt;
     }
+    asm( "csrw 0x7c0, %0" :: "r"(0x00030003) );  /* Flush */
 }
 
 void my_printf( const wchar_t* fmt, ... )
@@ -95,7 +96,7 @@ int tty_info(const wchar_t *format, ...) { LOG(L"[INFO] ", L"\r\n") }
 int tty_fatal(const wchar_t *format, ...)
 {
     LOG(L"\x1B[1;31m[FATAL] ", L"\x1B[1;0m\r\n") /* red color */
-    __asm__ ( "csrw 0x7c0, %0" :: "r"(0x10000) );
+    asm( "csrw 0x7c0, %0" :: "r"(0x10000) );
 }
 
 int tty_success(const wchar_t *format, ...)

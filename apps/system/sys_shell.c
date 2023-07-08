@@ -31,7 +31,7 @@ int main() {
     memcpy(grass->workdir, L"/home/yunhao", 13 * 4);
     printf(L"\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
     while(1);
-    
+
     char buf[256] = "cd";  /* Enter the home directory first */
     while (1) {
         struct proc_request req;
