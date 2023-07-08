@@ -27,3 +27,34 @@ void my_memset(void* dst, int val, int len) {
     for (int i = 0; i < len / 4; i++)
         ((int*)dst)[i] = val;
 }
+
+int my_strcmp(int* left, int* right) {
+    int idx = 0;
+    while (1) {
+        if (left[idx] == right[idx]) {
+            if (left[idx] == 0) return 0;
+            idx++;
+            continue;
+        }
+        return -1;
+    }
+}
+
+int my_strcpy(int* dst, int* src) {
+    int idx = 0;
+    while (1) {
+        dst[idx] = src[idx];
+        if (src[idx] == 0)
+            return 0;
+        idx++;
+    }
+}
+
+int my_strlen(int* src) {
+    int idx = 0;
+    while (1) {
+        if (src[idx] == 0)
+            return idx;
+        idx++;
+    }
+}

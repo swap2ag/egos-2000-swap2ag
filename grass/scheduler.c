@@ -158,7 +158,8 @@ static void proc_recv(struct syscall *sc) {
     if (sender == -1) {
         curr_status = PROC_WAIT_TO_RECV;
     } else {
-        FATAL(L"proc_recv: not implemented");
+        struct syscall *src_sc = (struct syscall*)(grass->proc_entry(sender) + SYSCALL_ARG_OFFSET);
+        memcpy(&sc->msg, &src_sc->msg, sizeof(struct sys_msg));
 
         /* Set sender process as runnable */
         proc_set_runnable(sender);

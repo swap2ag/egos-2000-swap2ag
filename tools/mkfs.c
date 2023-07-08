@@ -21,6 +21,7 @@
 
 #include "disk.h"
 #include "file.h"
+#include <wchar.h>
 
 #define NKERNEL_PROC 5
 char* kernel_processes[] = {
@@ -39,13 +40,13 @@ char* kernel_processes[] = {
 */
 #define NINODE 16
 char* contents[] = {
-                    "./   0 ../   0 home/   1 bin/   6 ",
-                    "./   1 ../   0 yunhao/   2 rvr/   3 lorenzo/   4 ",
-                    "./   2 ../   1 README   5 ",
-                    "./   3 ../   1 ",
-                    "./   4 ../   1 ",
-                    "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
-                    "./   6 ../   0 echo   7 cat   8 ls   9 cd  10 pwd  11 clock  12 crash1  13 crash2  14 ult  15 ",
+                    L"./   0 ../   0 home/   1 bin/   6 ",
+                    L"./   1 ../   0 yunhao/   2 rvr/   3 lorenzo/   4 ",
+                    L"./   2 ../   1 README   5 ",
+                    L"./   3 ../   1 ",
+                    L"./   4 ../   1 ",
+                    L"With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
+                    L"./   6 ../   0 echo   7 cat   8 ls   9 cd  10 pwd  11 clock  12 crash1  13 crash2  14 ult  15 ",
                     "#../build/release/echo.elf",
                     "#../build/release/cat.elf",
                     "#../build/release/ls.elf",
@@ -106,8 +107,8 @@ void mkfs() {
     char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
     for (int ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
-            fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
-            strncpy(buf, contents[ino], BLOCK_SIZE);
+            fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, wcslen(contents[ino]));
+            wcsncpy(buf, contents[ino], BLOCK_SIZE / 4);
             treedisk->write(treedisk, ino, 0, (void*)buf);
         } else {
             struct stat st;

@@ -10,17 +10,18 @@
 
 #include "egos.h"
 #include "servers.h"
-#include <string.h>
+extern int my_strcpy(int* dst, int* src);
+extern void my_memcpy(void* dst, void* src, int len);
 
 static int sender;
-static char buf[SYSCALL_MSG_LEN];
+static int buf[SYSCALL_MSG_LEN / sizeof(int)];
 
 void exit(int status) {
     grass->sys_exit(status);
     while(1);
 }
 
-int dir_lookup(int dir_ino, char* name) {
+int dir_lookup(int dir_ino, int* name) {
     struct dir_request req;
     req.type = DIR_LOOKUP;
     req.ino = dir_ino;
@@ -34,7 +35,7 @@ int dir_lookup(int dir_ino, char* name) {
     return reply->status == DIR_OK? reply->ino : -1;
 }
 
-int file_read(int file_ino, int offset, char* block) {
+int file_read(int file_ino, int offset, int* block) {
     struct file_request req;
     req.type = FILE_READ;
     req.ino = file_ino;

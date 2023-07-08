@@ -31,5 +31,5 @@ struct elf32_program_header {
     uint32_t       p_align;
 };
 
-typedef int (*elf_reader)(int block_no, char* dst);
+typedef int (*elf_reader)(int block_no, int* dst);
 void elf_load(int pid, elf_reader reader, int argc, void** argv);

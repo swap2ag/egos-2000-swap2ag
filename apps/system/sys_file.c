@@ -19,7 +19,7 @@ int main() {
     inode_intf fs = treedisk_init(fs_disk_init(), 0);
 
     /* Send a notification to GPID_PROCESS */
-    char buf[SYSCALL_MSG_LEN];
+    int buf[SYSCALL_MSG_LEN / sizeof(int)];
     memcpy(buf, L"Finish GPID_FILE initialization", 32 * 4);
     grass->sys_send(GPID_PROCESS, buf, 32 * 4);
 

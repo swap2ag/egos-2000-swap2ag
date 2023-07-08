@@ -112,32 +112,24 @@ int tty_critical(const wchar_t *format, ...)
 static int c, is_reading;
 int tty_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
-int tty_read(char* buf, int len) {
-  /*
+int tty_read(wchar_t* buf, int len) {
     is_reading = 1;
     for (int i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; uart_getc(&c));
-        buf[i] = (char)c;
+        //for (c = -1; c == -1; uart_getc(&c));
+        c = -1;
+        while (c == -1)
+          asm( "csrr %0, 0xfc0" : "=r"(c) );
+        asm( "csrw 0x7c0, %0" :: "r"(0x00040000) );
 
-        switch (c) {
-        case 0x03:  // Ctrl+C
-            buf[0] = 0;
-        case 0x0d:  // Enter
-            buf[i] = is_reading = 0;
-            printf(L"\r\n");
-            return c == 0x03? 0 : i;
-        case 0x7f:  // Backspace
-            c = 0;
-            if (i) printf(L"\b \b");
-            i = i ? i - 2 : i - 1;
+        buf[i] = c;
+        if (c == 10) {  /* Enter */
+            buf[i] = 0;
+            return i;
         }
-
-        if (c) printf(L"%c", c);
     }
 
     buf[len - 1] = is_reading = 0;    
     return len - 1;
-    */
 }
 
 void tty_init() {

@@ -83,7 +83,7 @@ static void load_app(int pid, elf_reader reader,
 
 void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     char buf[BLOCK_SIZE];
-    reader(0, buf);
+    reader(0, (void*)buf);
 
     struct elf32_header *header = (void*) buf;
     struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);

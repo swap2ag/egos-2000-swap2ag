@@ -14,11 +14,11 @@ struct earth {
     int (*mmu_translate)(int pid, int page_no);
 
     /* Devices interface */
-    int (*disk_read)(int block_no, int nblocks, char* dst);
-    int (*disk_write)(int block_no, int nblocks, char* src);
+    int (*disk_read)(int block_no, int nblocks, int* dst);
+    int (*disk_write)(int block_no, int nblocks, int* src);
 
     int (*tty_intr)();
-    int (*tty_read)(char* buf, int len);
+    int (*tty_read)(wchar_t* buf, int len);
     int (*tty_write)(wchar_t* buf, int len);
 
     int (*tty_printf)(const wchar_t *format, ...);
@@ -35,7 +35,7 @@ struct earth {
 struct grass {
     /* Shell environment variables */
     int workdir_ino;
-    char workdir[128];
+    wchar_t workdir[128];
 
     /* Process control interface */
     int  (*proc_alloc)();
@@ -45,8 +45,8 @@ struct grass {
 
     /* System call interface */
     void (*sys_exit)(int status);
-    int  (*sys_send)(int pid, char* msg, int size);
-    int  (*sys_recv)(int* pid, char* buf, int size);
+    int  (*sys_send)(int pid, int* msg, int size);
+    int  (*sys_recv)(int* pid, int* buf, int size);
     void (*tmp_ecall)(int id);
 };
 
@@ -83,8 +83,13 @@ extern struct grass *grass;
 #define memset my_memset
 #undef memcpy
 #define memcpy my_memcpy
+#undef strcmp
+#define strcmp my_strcmp
+#undef strcpy
+#define strcpy my_strcpy
+#undef strlen
+#define strlen my_strlen
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
-#define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))

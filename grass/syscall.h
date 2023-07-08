@@ -12,7 +12,7 @@ enum syscall_type {
 struct sys_msg {
     int sender;
     int receiver;
-    char content[SYSCALL_MSG_LEN];
+    int content[SYSCALL_MSG_LEN / sizeof(int)];
 };
 
 struct syscall {
@@ -22,6 +22,6 @@ struct syscall {
 };
 
 void sys_exit(int status);
-int  sys_send(int pid, char* msg, int size);
-int  sys_recv(int* pid, char* buf, int size);
+int  sys_send(int pid, int* msg, int size);
+int  sys_recv(int* pid, int* buf, int size);
 void  intr_entry(int id);

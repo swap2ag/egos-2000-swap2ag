@@ -19,7 +19,7 @@ int main() {
     SUCCESS(L"Enter kernel process GPID_PROCESS");
 
     int sender, shell_waiting;
-    char buf[SYSCALL_MSG_LEN];
+    int buf[SYSCALL_MSG_LEN / sizeof(int)];
 
     sys_spawn(SYS_FILE_EXEC_START);
     grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
@@ -38,6 +38,7 @@ int main() {
 
         switch (req->type) {
         case PROC_SPAWN:
+            INFO(L"sys_proc: invoking app_spawn() for %s", req->argv[0]);
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
             /* Handling background processes */
@@ -63,25 +64,27 @@ int main() {
     }
 }
 
-static int app_read(int off, char* dst) { file_read(app_ino, off, dst); }
+static int app_read(int off, int* dst) { file_read(app_ino, off, dst); }
 
 static int app_spawn(struct proc_request *req) {
-    /*
-    int bin_ino = dir_lookup(0, "bin/");
+    /* Skip the dir_lookup() below for better performance */
+    //int bin_ino = dir_lookup(0, L"bin/");
+    int bin_ino = 6;
+    INFO(L"app_spawn(): /bin is inode #%d", bin_ino);
     if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
+    INFO(L"app_spawn(): /bin/%s is inode #%d", req->argv[0], app_ino);
 
     app_pid = grass->proc_alloc();
 
     elf_load(app_pid, app_read, req->argc, (void**)req->argv);
     grass->proc_set_ready(app_pid);
-    */
     return 0;
 }
 
 static int sys_proc_base;
 wchar_t* sysproc_names[] = {L"sys_proc", L"sys_file", L"sys_dir", L"sys_shell"};
 
-static int sys_proc_read(int block_no, char* dst) {
+static int sys_proc_read(int block_no, int* dst) {
     return earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 

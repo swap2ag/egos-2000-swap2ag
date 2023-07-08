@@ -8,18 +8,18 @@
  */
 
 #include "app.h"
-#include <string.h>
+extern int my_strlen(int* src);
 
-int main(int argc, char** argv) {
+int main(int argc, wchar_t ** argv) {
     if (argc > 1) {
         INFO(L"ls: ls with args not implemented");
         return -1;
     }
 
     /* Read the directory content */
-    char buf[BLOCK_SIZE];
+    int buf[BLOCK_SIZE / sizeof(int)];
     file_read(grass->workdir_ino, 0, buf);
-    
+
     /* Remove the inode numbers from the string */
     for (int i = 1; i < strlen(buf); i++)
         if (buf[i - 1] == ' ' && buf[i] >= '0' && buf[i] <= '9') buf[i] = ' ';

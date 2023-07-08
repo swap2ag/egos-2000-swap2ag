@@ -21,5 +21,5 @@
 typedef unsigned int block_no;      /* index of a block */
 
 typedef struct block {
-    char bytes[BLOCK_SIZE];
+    int bytes[BLOCK_SIZE / sizeof(int)];
 } block_t;

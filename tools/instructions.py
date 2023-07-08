@@ -11,7 +11,6 @@ for file in files:
         l = re.split('\t|\n', line)
         if len(l) > 2 and len(l[2]) > 0:
             instructions.add(l[2])
-instructions.add("ecall")
 
 print("\033[1;32m[INFO] In total, there are {} instructions.\033[0m".format(len(instructions)))
 print(sorted(list(instructions)))

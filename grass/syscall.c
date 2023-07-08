@@ -21,7 +21,7 @@ static void sys_invoke() {
     grass->tmp_ecall(3);
 }
 
-int sys_send(int receiver, char* msg, int size) {
+int sys_send(int receiver, int* msg, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
     struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
@@ -32,7 +32,7 @@ int sys_send(int receiver, char* msg, int size) {
     return sc->retval;    
 }
 
-int sys_recv(int* sender, char* buf, int size) {
+int sys_recv(int* sender, int* buf, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
     struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);

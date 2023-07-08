@@ -8,9 +8,9 @@
  */
 
 #include "app.h"
-#include <string.h>
+extern int my_strlen(int* src);
 
-int main(int argc, char** argv) {
+int main(int argc, wchar_t ** argv) {
     if (argc == 1) {
         INFO(L"usage: cat [FILE]");
         return -1;
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
     }
 
     /* Read and print the first block of the file */
-    char buf[BLOCK_SIZE];
+    int buf[BLOCK_SIZE / sizeof(int)];
     file_read(file_ino, 0, buf);
     printf(L"%s", buf);
     if (buf[strlen(buf) - 1] != '\n') printf(L"\r\n");

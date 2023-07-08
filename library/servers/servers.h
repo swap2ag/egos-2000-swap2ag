@@ -4,8 +4,8 @@
 #define SYSCALL_MSG_LEN    1024
 
 void exit(int status);
-int dir_lookup(int dir_ino, char* name);
-int file_read(int file_ino, int offset, char* block);
+int dir_lookup(int dir_ino, int* name);
+int file_read(int file_ino, int offset, int* block);
 
 enum grass_servers {
     GPID_UNUSED,
@@ -17,8 +17,8 @@ enum grass_servers {
 };
 
 /* GPID_PROCESS */
-#define CMD_NARGS       16
-#define CMD_ARG_LEN     32
+#define CMD_NARGS       8
+#define CMD_ARG_LEN     16
 struct proc_request {
     enum {
           PROC_SPAWN,
@@ -26,7 +26,7 @@ struct proc_request {
           PROC_KILLALL
     } type;
     int argc;
-    char argv[CMD_NARGS][CMD_ARG_LEN];
+    int argv[CMD_NARGS][CMD_ARG_LEN];
 };
 
 struct proc_reply {
@@ -64,7 +64,7 @@ struct dir_request {
           DIR_REMOVE
     } type;
     int ino;
-    char name[DIR_NAME_SIZE];
+    int name[DIR_NAME_SIZE];
 };
 
 struct dir_reply {
