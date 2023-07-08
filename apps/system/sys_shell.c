@@ -29,8 +29,24 @@ int parse_request(char* buf, struct proc_request* req) {
 int main() {
     CRITICAL(L"Welcome to the egos-2000 shell!");
     memcpy(grass->workdir, L"/home/yunhao", 13 * 4);
+
+    int idx = 0, tmp[100];
     printf(L"\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
-    while(1);
+    while (1) {
+        tmp[idx] = -1;
+        while (tmp[idx] == -1)
+            asm( "csrr %0, 0xfc0" : "=r"(tmp[idx]) );
+        asm( "csrw 0x7c0, %0" :: "r"(0x00040000) );
+
+        if (tmp[idx] == 10) {
+            tmp[idx + 1] = 0;
+            printf(L"shell: %s", tmp);
+            printf(L"\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
+            idx = 0;
+        } else {
+            idx++;
+        }
+    }
 
     char buf[256] = "cd";  /* Enter the home directory first */
     while (1) {
