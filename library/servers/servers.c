@@ -18,7 +18,8 @@ static int buf[SYSCALL_MSG_LEN / sizeof(int)];
 
 void exit(int status) {
     grass->sys_exit(status);
-    while(1);
+    while(1)
+        grass->tmp_ecall(7);
 }
 
 int dir_lookup(int dir_ino, int* name) {

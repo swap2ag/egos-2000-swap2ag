@@ -70,7 +70,7 @@ int proc_alloc() {
 
 void proc_free(int pid) {
     if (pid != -1) {
-        earth->mmu_free(pid);
+        //earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);
         return;
     }
@@ -79,7 +79,7 @@ void proc_free(int pid) {
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid >= GPID_USER_START &&
             proc_set[i].status != PROC_UNUSED) {
-            earth->mmu_free(proc_set[i].pid);
+            //earth->mmu_free(proc_set[i].pid);
             proc_set[i].status = PROC_UNUSED;
         }
 }
