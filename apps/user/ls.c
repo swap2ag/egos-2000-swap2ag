@@ -11,8 +11,6 @@
 extern int my_strlen(int* src);
 
 int main(int argc, wchar_t ** argv) {
-    INFO(L"Enter the main() of ls");
-
     if (argc > 1) {
         INFO(L"ls: ls with args not implemented");
         return -1;
