@@ -46,6 +46,12 @@ static void load_app(int pid, elf_reader reader,
         INFO(L"Finish loading app binary");
 
         *((int*)APPS_ARG) = argc;
+        memcpy((void*)(APPS_ARG + 4 + 4 * argc), argv, 16 * argc * 4);
+        for (int i = 0; i < argc; i++) {
+            int* argv_i = (void*) (APPS_ARG + 4 + 4 * i);
+            *argv_i = APPS_ARG + 4 + 4 * argc + 16 * i * 4;
+        }
+        INFO(L"Finish loading argc and argv");
     }
 }
 

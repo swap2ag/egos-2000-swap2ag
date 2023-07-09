@@ -92,6 +92,8 @@ static int app_spawn(struct proc_request *req) {
     int bin_ino = 6;
     INFO(L"app_spawn(): /bin is inode #%d", bin_ino);
 
+    /* Skip the dir_lookup() below for better performance */
+    //if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
     for (int ino = 7; ino < 16; ino++) {
         int same = 0, idx = 0;
         while (req->argv[0][idx] == apps_ino[ino][idx]) {
@@ -106,7 +108,6 @@ static int app_spawn(struct proc_request *req) {
             break;
         }
     }
-    //if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
     INFO(L"app_spawn(): /bin/%s is inode #%d", req->argv[0], app_ino);
 
     app_pid = grass->proc_alloc();
