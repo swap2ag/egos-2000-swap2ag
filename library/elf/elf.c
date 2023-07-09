@@ -36,49 +36,17 @@ static void load_app(int pid, elf_reader reader,
 
         apps_entry[pid] = (void*)(GRASS_START + GRASS_EXEC_NBYTE * pid + pheader->p_offset);
     } else {
-        FATAL(L"load_app: not implemented");
-    }
+        apps_entry[pid] = (void*)(APPS_ENTRY);
+        INFO(L"Start loading app binary: %d bytes", pheader->p_filesz);
 
-    /*
-    void* base;
-    int frame_no, block_offset = pheader->p_offset / BLOCK_SIZE;
-    unsigned int code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
-
-    // Setup the text, rodata, data and bss sections
-    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
-        if (off % PAGE_SIZE == 0) {
-            earth->mmu_alloc(&frame_no, &base);
-            earth->mmu_map(pid, code_start++, frame_no);
+        int block_offset = pheader->p_offset / BLOCK_SIZE;
+        for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
+            reader(block_offset++, (void*)(APPS_ENTRY + off));
         }
-        reader(block_offset++, (char*)base + (off % PAGE_SIZE));
+        INFO(L"Finish loading app binary");
+
+        *((int*)APPS_ARG) = argc;
     }
-    int last_page_filled = pheader->p_filesz % PAGE_SIZE;
-    int last_page_nzeros = PAGE_SIZE - last_page_filled;
-    if (last_page_filled)
-        memset((char*)base + last_page_filled, 0, last_page_nzeros);
-
-    while (code_start < ((APPS_ENTRY + APPS_SIZE) >> 12)) {
-        earth->mmu_alloc(&frame_no, &base);
-        earth->mmu_map(pid, code_start++, frame_no);
-        memset((char*)base, 0, PAGE_SIZE);
-    }
-
-    // Setup two pages for argc, argv and stack
-    earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, stack_start++, frame_no);
-
-    int* argc_addr = (int*)base;
-    int* argv_addr = argc_addr + 1;
-    int* args_addr = argv_addr + CMD_NARGS;
-
-    *argc_addr = argc;
-    if (argv) memcpy(args_addr, argv, argc * CMD_ARG_LEN);
-    for (int i = 0; i < argc; i++)
-        argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
-
-    earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, stack_start++, frame_no);
-    */
 }
 
 void elf_load(int pid, elf_reader reader, int argc, void** argv) {
@@ -90,10 +58,6 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
 
     if (pheader->p_vaddr == GRASS_ENTRY)
         load_grass(reader, pheader);
-    else if (pheader->p_vaddr > DISK_START)
-        load_app(pid, reader, argc, argv, pheader);
     else
-        FATAL(L"elf_load: ELF gives invalid p_vaddr: %d", pheader->p_vaddr);
+        load_app(pid, reader, argc, argv, pheader);
 }
-
-

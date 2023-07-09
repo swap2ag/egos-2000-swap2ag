@@ -106,13 +106,14 @@ static void proc_yield() {
     /* Call the entry point for newly created process */
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
-        /* Prepare argc and argv */
-        asm("mv a0, %0" ::"r"(APPS_ARG));
-        asm("mv a1, %0" ::"r"(APPS_ARG + 4));
 
         int entry = proc_entry(curr_pid);
         int stack_top = entry + PAGE_SIZE * 5;
         asm("mv t0, %0" ::"r"(stack_top));
+
+        /* Prepare argc and argv */
+        asm("mv a0, %0" ::"r"(APPS_ARG));
+        asm("mv a1, %0" ::"r"(APPS_ARG + 4));
 
         /* Enter application code entry using mret */
         //asm("csrw mepc, %0" ::"r"(APPS_ENTRY));

@@ -60,8 +60,8 @@ extern struct grass *grass;
                                        /*        earth interface       */
 #define APPS_STACK_TOP     0x002FF000  /* 6KB    app stack             */
 #define SYSCALL_ARG_OFFSET 0x00003400  /* 1KB    system call args      */
-#define APPS_ARG           0x002FD000  /* 1KB    app main() argc, argv */
-#define APPS_SIZE          0x00003000  
+#define APPS_ARG           0x00203000  /* 1KB    app main() argc, argv */
+#define APPS_SIZE          0x00003000
 #define APPS_ENTRY         0x00200000  /* 12KB   app code+data         */
 #define GRASS_STACK_TOP    0x001FF000  /* 8KB    earth/grass stack     */
                                        /*        grass interface       */

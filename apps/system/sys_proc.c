@@ -64,14 +64,49 @@ int main() {
     }
 }
 
-static int app_read(int off, int* dst) { file_read(app_ino, off, dst); }
+static int app_read(int off, int* dst) {
+    //file_read(app_ino, off, dst);
+
+    /* The file system starts at 2MB of the disk */
+    int base = 1024 * 1024 * 2 / 512;
+    int block_no = base + app_ino * 30 + off;
+    /* Read app_ino from the dummy file system for better performance */
+    earth->disk_read(block_no, 1, dst);
+}
+
+wchar_t* apps_ino[] = {L"not app", L"not app", L"not app", 
+                       L"not app", L"not app", L"not app", L"not app", 
+                       L"echo",    // ino = 7
+                       L"cat",
+                       L"ls",
+                       L"cd",
+                       L"pwd",
+                       L"clock",
+                       L"crash1",
+                       L"crash2",
+                       L"ult"};
 
 static int app_spawn(struct proc_request *req) {
     /* Skip the dir_lookup() below for better performance */
     //int bin_ino = dir_lookup(0, L"bin/");
     int bin_ino = 6;
     INFO(L"app_spawn(): /bin is inode #%d", bin_ino);
-    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
+
+    for (int ino = 7; ino < 16; ino++) {
+        int same = 0, idx = 0;
+        while (req->argv[0][idx] == apps_ino[ino][idx]) {
+            idx++;
+            if (req->argv[0][idx] == 0) {
+                same = 1;  // req->argv[0] equals to apps_ino[ino]
+                break;
+            }
+        }
+        if (same) {
+            app_ino = ino;
+            break;
+        }
+    }
+    //if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
     INFO(L"app_spawn(): /bin/%s is inode #%d", req->argv[0], app_ino);
 
     app_pid = grass->proc_alloc();
