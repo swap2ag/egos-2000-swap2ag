@@ -30,13 +30,6 @@ void intr_entry(int id) {
         return;
     }
 
-    if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
-        /* User process killed by ctrl+c interrupt */
-        INFO(L"process %d killed by interrupt", curr_pid);
-        asm("csrw mepc, %0" ::"r"(0x800500C));
-        return;
-    }
-
     if (id == INTR_ID_SOFT)
         kernel_entry = proc_syscall;
     else if (id == INTR_ID_TIMER)
@@ -54,9 +47,8 @@ void ctx_entry() {
     /* Now on the kernel stack */
 
     int mepc, tmp;
-    // TODO: ecall
-    //asm("csrr %0, mepc" : "=r"(mepc));
-    //proc_set[proc_curr_idx].mepc = (void*) mepc;
+    asm("csrr %0, mepc" : "=r"(mepc));
+    proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* Student's code goes here (page table translation). */
     /* Save the interrupt stack */
@@ -70,9 +62,8 @@ void ctx_entry() {
     /* Student's code ends here. */
 
     /* Switch back to the user application stack */
-    // TODO: ecall
-    //mepc = (int)proc_set[proc_curr_idx].mepc;
-    //asm("csrw mepc, %0" ::"r"(mepc));
+    mepc = (int)proc_set[proc_curr_idx].mepc;
+    asm("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
@@ -116,10 +107,8 @@ static void proc_yield() {
         asm("mv a1, %0" ::"r"(APPS_ARG + 4));
 
         /* Enter application code entry using mret */
-        //asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
-        //asm("mret");
-        asm("mv ra, %0" ::"r"(entry));
-        asm("ret");
+        asm("csrw mepc, %0" ::"r"(entry));
+        asm("mret");
     }
 
     proc_set_running(curr_pid);

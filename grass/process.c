@@ -17,6 +17,14 @@ void excp_entry(int id) {
     /* Student's code goes here (handle memory exception). */
 
     /* If id is for system call, handle the system call and return */
+    if (id == 11) {
+        intr_entry(3);
+
+        int mepc;
+        asm("csrr %0, mepc" : "=r"(mepc));
+        asm("csrw mepc, %0" ::"r"(mepc + 4));
+        return;
+    }
 
     /* Otherwise, kill the process if curr_pid is a user application */
 

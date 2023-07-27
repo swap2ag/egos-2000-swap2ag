@@ -14,11 +14,7 @@ extern void my_memcpy(void* dst, void* src, int len);
 static void sys_invoke() {
     /* The standard way of system call is using the `ecall` instruction; 
      * Switching to ecall is given to students as an exercise */
-    //*((int*)0x2000000) = 1;
-    //while (sc->type != SYS_UNUSED);
-
-    // TODO: ecall
-    grass->tmp_ecall(3);
+    asm("ecall");
 }
 
 int sys_send(int receiver, int* msg, int size) {
