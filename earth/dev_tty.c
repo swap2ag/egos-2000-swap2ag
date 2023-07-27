@@ -117,8 +117,9 @@ int tty_read(wchar_t* buf, int len) {
     for (int i = 0; i < len - 1; i++) {
         //for (c = -1; c == -1; uart_getc(&c));
         c = -1;
-        while (c == -1)
+        while (c == -1 || c == 0) {
           asm( "csrr %0, 0xfc0" : "=r"(c) );
+        }
         asm( "csrw 0x7c0, %0" :: "r"(0x00040000) );
 
         buf[i] = c;
