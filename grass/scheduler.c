@@ -159,6 +159,7 @@ static void proc_recv(struct syscall *sc) {
 }
 
 static void proc_syscall() {
+    INFO(L"Processing ecall");
     struct syscall *sc = (struct syscall*)(grass->proc_entry(-1) + SYSCALL_ARG_OFFSET);
 
     int type = sc->type;
