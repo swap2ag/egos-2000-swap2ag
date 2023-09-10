@@ -46,10 +46,30 @@ static int grass_read(int block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-int main() {
+static volatile int hart1_ready;
+
+int main(int mhartid) {
     /* Prepare the bss and data memory regions */
-    memset(&bss_start, 0, (&bss_end - &bss_start));
-    memcpy(&data_start, &data_rom, (&data_end - &data_start));
+    if (mhartid == 1) {
+        /* Hart#1 does part of the initialization */
+        memset(&bss_start, 0, (&bss_end - &bss_start));
+        memcpy(&data_start, &data_rom, (&data_end - &data_start));
+        tty_init();
+    } else {
+        /* Wait for the BSS section to be cleared with 0s */
+        for(long long i = 0; i < 0x02000000; i++);
+
+        while (!hart1_ready)
+            for(long long i = 0; i < 0x0020000; i++);
+    }
+
+    if (mhartid == 0) {
+        SUCCESS("CPU hart#%d continues", mhartid);
+    } else {
+        CRITICAL("CPU hart#%d blocks here", mhartid);
+        hart1_ready = 1;
+        while(1);
+    }
 
     /* Initialize the earth layer */
     earth_init();

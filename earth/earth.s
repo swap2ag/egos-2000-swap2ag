@@ -15,8 +15,14 @@ earth_enter:
     li t0, 0x8
     csrc mstatus, t0
 
+    csrr a0, mhartid
+    beq a0, zero, hart0_enter
     /* Call main() of earth.c */
+hart1_enter:
     li sp, 0x80003f80
+    call main
+hart0_enter:
+    li sp, 0x80003000
     call main
 
 trap_entry_vmem:
