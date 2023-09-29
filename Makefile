@@ -29,7 +29,7 @@ CFLAGS = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdia
 COMMON = $(CFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
 DEBUG_FLAGS =  --source --all-headers --demangle --line-numbers --wide
 
-egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/grass.elf $(RELEASE)/earth.elf
+egos: $(RELEASE)/grass.elf $(RELEASE)/earth.elf
 
 $(RELEASE)/earth.elf: $(EARTH_DEPS)
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
@@ -37,20 +37,10 @@ $(RELEASE)/earth.elf: $(EARTH_DEPS)
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/earth.lst
 
 $(RELEASE)/grass.elf: $(GRASS_DEPS)
+	@mkdir -p $(DEBUG) $(RELEASE)
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) grass/grass.s $(filter %.c, $(wildcard $^)) -Tgrass/grass.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/grass.lst
-
-$(SYSAPP_ELFS): $(RELEASE)/%.elf : apps/system/%.c $(APPS_DEPS)
-	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
-	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
-
-$(USRAPP_ELFS): $(RELEASE)/%.elf : apps/user/%.c $(APPS_DEPS)
-	@mkdir -p $(DEBUG) $(RELEASE)
-	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
-	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 install: egos
 	@echo "$(GREEN)-------- Create the Disk Image --------$(END)"

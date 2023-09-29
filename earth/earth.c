@@ -37,7 +37,6 @@ static void earth_init() {
     SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
-    timer_init();
     intr_init();
     SUCCESS("Finished initializing the CPU MMU, timer and interrupts");
 }
