@@ -53,7 +53,8 @@ char* contents[] = {
                     "#../build/release/clock.elf",
                     "#../build/release/crash1.elf",
                     "#../build/release/crash2.elf",
-                    "#../build/release/ult.elf"};
+                    "#../build/release/ult.elf",
+                    "#../build/release/helloworld.elf"};
 
 char fs[FS_DISK_SIZE], exec[GRASS_EXEC_SIZE];
 
@@ -90,7 +91,7 @@ int main() {
     }
     memset(exec, 0, GRASS_EXEC_SIZE);
     write(1, exec, (GRASS_NEXEC - NKERNEL_PROC) * exec_size);
-        
+
     /* File system */
     write(1, fs, FS_DISK_SIZE);
     fclose(stdout);
@@ -115,11 +116,11 @@ void mkfs() {
             struct stat st;
             char* file_name = &contents[ino][1];
             stat(file_name, &st);
-            
+
             freopen(file_name, "r", stdin);
             for (int nread = 0; nread < st.st_size; )
                 nread += read(0, buf + nread, st.st_size - nread);
-            
+
             fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
             for (int b = 0; b * BLOCK_SIZE < st.st_size; b++)
                 treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
